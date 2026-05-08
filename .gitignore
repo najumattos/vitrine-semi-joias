@@ -3,7 +3,7 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
-
+Controllers/Api
 # User-specific files
 *.rsuser
 *.suo

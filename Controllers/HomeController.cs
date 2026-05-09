@@ -1,21 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using VitrineSemiJoias.Models;
+using VitrineSemiJoias.Services.Interfaces;
 
 namespace VitrineSemiJoias.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IProductService _productService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IProductService productService)
         {
             _logger = logger;
+            _productService = productService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var result = await _productService.GetAllProductsAsync();
+            var products = result.IsSuccess ? result.Value ?? Enumerable.Empty<VitrineSemiJoias.ViewModels.ProductViewModel>() : Enumerable.Empty<VitrineSemiJoias.ViewModels.ProductViewModel>();
+            return View(products);
         }
 
         public IActionResult Privacy()

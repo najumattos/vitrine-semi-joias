@@ -1,157 +1,84 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using VitrineSemiJoias.Data;
-using VitrineSemiJoias.Models;
+using VitrineSemiJoias.Services.Interfaces;
+using VitrineSemiJoias.ViewModels;
 
-namespace VitrineSemiJoias.Controllers
+namespace VitrineSemiJoias.Controllers;
+
+public class ProductsController(IProductService service) : Controller
 {
-    public class ProductsController : Controller
+    [HttpGet]
+    public async Task<IActionResult> Index()
     {
-        private readonly AppDbContext _context;
+        var result = await service.GetAllProductsAsync();
 
-        public ProductsController(AppDbContext context)
-        {
-            _context = context;
-        }
+        if (!result.IsSuccess)
+            return View(Enumerable.Empty<ProductViewModel>());
 
-        // GET: Products
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Posts.ToListAsync());
-        }
+        return View(result.Value);
+    }
+     
+    [HttpGet]
+    public async Task<IActionResult> Details(int id)
+    {
+        var result = await service.GetProductByIdAsync(id);
 
-        // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        if (!result.IsSuccess)
+            return NotFound(result.Error); 
 
-            var productModel = await _context.Posts
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (productModel == null)
-            {
-                return NotFound();
-            }
+        return View(result.Value);
+    }
 
-            return View(productModel);
-        }
+    [HttpGet]
+    public IActionResult Create() => View();
 
-        // GET: Products/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+    [HttpPost]
+    public async Task<IActionResult> Create(ProductViewModel product)
+    {
+        if (!ModelState.IsValid) return View(product);
 
-        // POST: Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,Price,ImageUrl,StockQuantity,CategoryEnum,IsAvailable")] ProductModel productModel)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(productModel);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(productModel);
-        }
+        var result = await service.AddProductAsync(product);
 
-        // GET: Products/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        if (result.IsSuccess)
+            return RedirectToAction(nameof(Index)); 
 
-            var productModel = await _context.Posts.FindAsync(id);
-            if (productModel == null)
-            {
-                return NotFound();
-            }
-            return View(productModel);
-        }
+        ModelState.AddModelError(string.Empty, result.Error);
+        return View(product);
+    }
 
-        // POST: Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Price,ImageUrl,StockQuantity,CategoryEnum,IsAvailable")] ProductModel productModel)
-        {
-            if (id != productModel.Id)
-            {
-                return NotFound();
-            }
+    [HttpGet]
+    public async Task<IActionResult> Update(int id)
+    {
+        var result = await service.GetProductByIdAsync(id);
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(productModel);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductModelExists(productModel.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(productModel);
-        }
+        if (!result.IsSuccess)
+            return NotFound();
 
-        // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        return View(result.Value); 
+    }
 
-            var productModel = await _context.Posts
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (productModel == null)
-            {
-                return NotFound();
-            }
+    [HttpPost]
+    public async Task<IActionResult> Update(ProductViewModel product)
+    {
+        if (!ModelState.IsValid) return View(product);
 
-            return View(productModel);
-        }
+        var result = await service.UpdateProductAsync(product);
 
-        // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var productModel = await _context.Posts.FindAsync(id);
-            if (productModel != null)
-            {
-                _context.Posts.Remove(productModel);
-            }
-
-            await _context.SaveChangesAsync();
+        if (result.IsSuccess)
             return RedirectToAction(nameof(Index));
-        }
 
-        private bool ProductModelExists(int id)
-        {
-            return _context.Posts.Any(e => e.Id == id);
-        }
+        ModelState.AddModelError(string.Empty, result.Error);
+        return View(product);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var result = await service.DeleteProductAsync(id);
+
+        if (result.IsSuccess)
+            return RedirectToAction(nameof(Index));
+
+        TempData["Error"] = result.Error;
+        return RedirectToAction(nameof(Index));
     }
 }

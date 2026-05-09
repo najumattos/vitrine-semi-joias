@@ -1,13 +1,20 @@
-@model VitrineSemiJoias.Models.ProductModel
+@model VitrineSemiJoias.ViewModels.ProductViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    Layout = null;
 }
 
-<h1>Details</h1>
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+<body>
 
 <div>
-    <h4>ProductModel</h4>
+    <h4>ProductViewModel</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -58,3 +65,5 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+</body>
+</html>

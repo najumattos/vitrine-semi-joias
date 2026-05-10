@@ -8,21 +8,27 @@ public static class DependencyInjectionConfig
     {
         var assembly = Assembly.GetExecutingAssembly();
 
-        var serviceTypes = assembly.GetTypes()
+        var implementationTypes = assembly.GetTypes()
             .Where(t => (t.Name.EndsWith("Service") || t.Name.EndsWith("Repository"))
                 && !t.IsInterface && !t.IsAbstract);
 
-        foreach (var serviceType in serviceTypes)
+        foreach (var type in implementationTypes)
         {
-           var interfaceType = serviceType.GetInterface($"I{serviceType.Name}");
+            // Pega todas as interfaces que a classe implementa
+            var interfaces = type.GetInterfaces();
 
-            if (interfaceType != null)
+            // Tenta encontrar a interface que segue o padrão I + NomeDaClasse
+            var mainInterface = interfaces.FirstOrDefault(i => i.Name == $"I{type.Name}");
+
+            if (mainInterface != null)
             {
-                services.AddScoped(interfaceType, serviceType);
+                services.AddScoped(mainInterface, type);
             }
             else
             {
-                services.AddScoped(serviceType);
+                // Se não achar a interface padrão, mas a classe implementa alguma interface, 
+                // você pode decidir se registra a primeira ou apenas a classe
+                services.AddScoped(type);
             }
         }
 

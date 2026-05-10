@@ -7,13 +7,17 @@ using VitrineSemiJoias.ViewModels;
 
 namespace VitrineSemiJoias.Services;
 
-public class ProductService(IProductRepository repository, IMapper mapper) : IProductService
+public class ProductService(IProductRepository repository, IMapper mapper, IFileService fileService) : IProductService
 {
-    public async Task<Result<ProductViewModel>> AddProductAsync(ProductViewModel product)
+    public async Task<Result<ProductViewModel>> AddProductAsync(ProductViewModel product, IFormFile arquivoFoto)
     {
         if (product == null)
         {
             return Result<ProductViewModel>.Failure("Produto inválido ou não informado.");
+        }
+        if (arquivoFoto != null)
+        {
+            product.ImageUrl = await fileService.SaveFileAsync(arquivoFoto, "img/products");
         }
         var response = await repository.AddProductAsync(mapper.Map<ProductModel>(product));
 
@@ -67,11 +71,15 @@ public class ProductService(IProductRepository repository, IMapper mapper) : IPr
         return Result<ProductViewModel>.Success(mapper.Map<ProductViewModel>(response.Value));
     }
 
-    public async Task<Result> UpdateProductAsync(ProductViewModel product)
+    public async Task<Result> UpdateProductAsync(ProductViewModel product, IFormFile arquivoFoto)
     {
         if (product == null)
         {
             return Result.Failure("Produto inválido ou não informado.");
+        }
+        if (arquivoFoto != null)
+        {
+            await AtualizarFoto(product, arquivoFoto);
         }
         var response = await repository.UpdateProductAsync(mapper.Map<ProductModel>(product));
 
@@ -80,5 +88,22 @@ public class ProductService(IProductRepository repository, IMapper mapper) : IPr
             return Result.Failure(response.Error);
         }
         return Result.Success();
-    }  
+    }
+
+    private async Task<string> AtualizarFoto(ProductViewModel product, IFormFile novaFoto)
+    {              
+        //Se o usuário já tiver uma foto, a antiga é deletada
+        if (!string.IsNullOrEmpty(product.ImageUrl))
+        {
+            await fileService.DeleteFileAsync(product.ImageUrl);
+        }
+
+        var novoPath = await fileService.SaveFileAsync(novaFoto, "img/products");
+
+        // 3. Atualiza o caminho da string no banco de dados
+        product.ImageUrl = novoPath;
+
+        // 4. Retornamos a URL completa para o Front-end já exibir a imagem
+        return fileService.GetFileUrl(novoPath);
+    }
 }

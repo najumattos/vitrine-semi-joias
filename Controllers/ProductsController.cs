@@ -32,11 +32,11 @@ public class ProductsController(IProductService service) : Controller
     public IActionResult Create() => View();
 
     [HttpPost]
-    public async Task<IActionResult> Create(ProductViewModel product)
+    public async Task<IActionResult> Create(ProductViewModel product, IFormFile arquivoFoto)
     {
         if (!ModelState.IsValid) return View(product);
 
-        var result = await service.AddProductAsync(product);
+        var result = await service.AddProductAsync(product, arquivoFoto);
 
         if (result.IsSuccess)
             return RedirectToAction(nameof(Index)); 
@@ -53,15 +53,15 @@ public class ProductsController(IProductService service) : Controller
         if (!result.IsSuccess)
             return NotFound();
 
-        return View(result.Value); 
+        return View(result.Value);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(ProductViewModel product)
+    public async Task<IActionResult> Update(ProductViewModel product, IFormFile arquivoFoto)
     {
         if (!ModelState.IsValid) return View(product);
 
-        var result = await service.UpdateProductAsync(product);
+        var result = await service.UpdateProductAsync(product, arquivoFoto);
 
         if (result.IsSuccess)
             return RedirectToAction(nameof(Index));

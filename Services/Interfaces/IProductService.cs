@@ -7,7 +7,7 @@ public interface IProductService
 {
     Task<Result<IEnumerable<ProductViewModel>>> GetAllProductsAsync();
     Task<Result<ProductViewModel>> GetProductByIdAsync(int id);
-    Task <Result<ProductViewModel>> AddProductAsync(ProductViewModel product);
-    Task<Result> UpdateProductAsync(ProductViewModel product);        
+    Task <Result<ProductViewModel>> AddProductAsync(ProductViewModel product, IFormFile arquivoFoto);
+    Task<Result> UpdateProductAsync(ProductViewModel product, IFormFile arquivoFoto);        
     Task<Result> DeleteProductAsync(int id);
 }

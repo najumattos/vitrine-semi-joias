@@ -2,42 +2,30 @@
 
 @{
     Layout = "_AdminLayout";
+    ViewData["Title"] = "Gerenciamento de Produtos | Todos Produtos";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Add Novo Produto</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                Titulo
+            </th>
+         
+            <th>
+                Preço
+            </th>          
+            <th>
+                Quantidade
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+               Categoria
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StockQuantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CategoryEnum)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsAvailable)
+                Disponibilidade
             </th>
             <th></th>
         </tr>
@@ -46,26 +34,27 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Title)
+                @item.Title
+            </td>         
+            <td>
+                    @item.Price.ToString("C2")
+            </td>         
+            <td>
+                @item.StockQuantity
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Description)
+                    @item.CategoryEnum.ToString()
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageUrl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StockQuantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoryEnum)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsAvailable)
-            </td>
+                <td>
+                    @if (item.IsAvailable)
+                    {
+                        <span class="badge bg-success">Ativo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inativo</span>
+                    }
+                </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
@@ -75,5 +64,3 @@
 }
     </tbody>
 </table>
-</body>
-</html>

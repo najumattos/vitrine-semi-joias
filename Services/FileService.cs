@@ -28,7 +28,7 @@ public class FileService(IWebHostEnvironment environment, IHttpContextAccessor h
         return filePath; // Retorna o path relativo: "img/usuarios/arquivo.png"
     }
 
-    public bool DeleteFileAsync(string filePath)
+    public async Task<bool> DeleteFileAsync(string filePath)
     {
         if (string.IsNullOrEmpty(filePath))
             return false;

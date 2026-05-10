@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 Env.Load();
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
 var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION")
     ?? throw new InvalidOperationException("A variável 'DB_CONNECTION' não foi encontrada no arquivo .env"); 
 

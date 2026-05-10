@@ -2,68 +2,80 @@
 
 @{
     Layout = "_AdminLayout";
+    ViewData["Title"] = "Detalhes do Produto";
 }
 
-<!DOCTYPE html>
+<div class="container-fluid px-4">
+    <h2 class="mt-4">Detalhes da Joia</h2>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a asp-action="Index">Produtos</a></li>
+        <li class="breadcrumb-item active">Visualizar Detalhes</li>
+    </ol>
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Details</title>
-</head>
-<body>
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header">
+            <i class="fas fa-info-circle me-1"></i> Informações do Produto
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Título</label>
+                        <input class="form-control" value="@Model.Title" readonly />
+                    </div>
 
-<div>
-    <h4>ProductViewModel</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageUrl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StockQuantity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StockQuantity)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CategoryEnum)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CategoryEnum)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsAvailable)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsAvailable)
-        </dd>
-    </dl>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Descrição</label>
+                        <textarea class="form-control" rows="4" readonly>@Model.Description</textarea>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Preço</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input class="form-control" value="@Model.Price" readonly />
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Estoque</label>
+                            <input class="form-control" value="@Model.StockQuantity" readonly />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Categoria</label>
+                        <input class="form-control" value="@Model.CategoryEnum" readonly />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Foto do Produto</label>
+                        <div class="mt-2">
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="/@Model.ImageUrl" alt="Foto do Produto"
+                                     style="max-width: 200px; border-radius: 4px; border: 1px solid #ddd; padding: 4px;" />
+                            }
+                            else
+                            {
+                                <div class="text-muted small">Nenhuma imagem cadastrada.</div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-3 form-check form-switch">
+                        <input class="form-check-input" type="checkbox" asp-for="IsAvailable" disabled>
+                        <label class="form-check-label">Disponível para venda</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary px-4">Editar</a>
+                <a asp-action="Index" class="btn btn-outline-secondary px-4">Voltar para Lista</a>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
-</body>
-</html>

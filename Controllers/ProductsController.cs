@@ -46,7 +46,7 @@ public class ProductsController(IProductService service) : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Update(int id)
+    public async Task<IActionResult> Edit(int id)
     {
         var result = await service.GetProductByIdAsync(id);
 
@@ -57,7 +57,7 @@ public class ProductsController(IProductService service) : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(ProductViewModel product, IFormFile arquivoFoto)
+    public async Task<IActionResult> Edit(ProductViewModel product, IFormFile arquivoFoto)
     {
         if (!ModelState.IsValid) return View(product);
 
@@ -70,8 +70,21 @@ public class ProductsController(IProductService service) : Controller
         return View(product);
     }
 
-    [HttpPost]
+    [HttpGet]
     public async Task<IActionResult> Delete(int id)
+    {
+        // Busca o produto para exibir os detalhes na tela de confirmação
+        var product = await service.GetProductByIdAsync(id);
+
+        if (product == null){
+            return NotFound();
+        }
+        
+        ProductViewModel model = product.Value;
+        return View(model);
+    }
+    [HttpPost]
+    public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var result = await service.DeleteProductAsync(id);
 

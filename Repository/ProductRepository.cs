@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VitrineSemiJoias.Common;
 using VitrineSemiJoias.Data;
+using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Models;
 using VitrineSemiJoias.Repository.Interfaces;
+using VitrineSemiJoias.ViewModels;
 
 namespace VitrineSemiJoias.Repository;
 
@@ -49,6 +51,26 @@ public class ProductRepository(AppDbContext context) : IProductRepository
             var products = await context.Products
                 .AsNoTracking() 
                 .ToListAsync();
+
+            return Result<IEnumerable<ProductModel>>.Success(products);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<ProductModel>>.Failure($"Erro ao listar produtos: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<IEnumerable<ProductModel>>> GetProductByCategoryAsync(CategoryEnum category)
+    {
+        try
+        {
+            var products = await context.Products
+            .AsNoTracking()
+            .Where(p => p.CategoryEnum == category)
+            .ToListAsync();
+
+            if (products == null || !products.Any())
+                return Result<IEnumerable<ProductModel>>.Failure("Nenhum produto encontrado para esta categoria.");
 
             return Result<IEnumerable<ProductModel>>.Success(products);
         }

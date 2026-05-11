@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Services.Interfaces;
 using VitrineSemiJoias.ViewModels;
 
@@ -26,6 +27,20 @@ public class ProductsController(IProductService service) : Controller
             return NotFound(result.Error); 
 
         return View(result.Value);
+    }
+    [HttpGet]
+    public async Task<IActionResult> Category(CategoryEnum category)
+    {
+        var result = await service.GetProductByCategoryAsync(category);
+
+        if (!result.IsSuccess)
+        {
+            // Opcional: Enviar mensagem de erro via TempData ou ViewBag
+            TempData["ErrorMessage"] = result.Error;
+            return View("~/Views/Home/Index.cshtml", Enumerable.Empty<ProductViewModel>());
+        }
+
+        return View("~/Views/Home/Index.cshtml", result.Value);
     }
 
     [HttpGet]

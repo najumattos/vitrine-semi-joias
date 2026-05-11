@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using VitrineSemiJoias.Common;
+using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Models;
 using VitrineSemiJoias.Repository.Interfaces;
 using VitrineSemiJoias.Services.Interfaces;
@@ -54,6 +55,21 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
         var productsVM = mapper.Map<IEnumerable<ProductViewModel>>(response.Value);
 
         return Result<IEnumerable<ProductViewModel>>.Success(productsVM);
+    }
+
+    public async Task<Result<IEnumerable<ProductViewModel>>> GetProductByCategoryAsync(CategoryEnum category)
+    {
+        if (!Enum.IsDefined(typeof(CategoryEnum), category))
+        {
+            return Result<IEnumerable<ProductViewModel>>.Failure("Categoria inválida ou não informada.");
+        }
+        var response = await repository.GetProductByCategoryAsync(category);
+
+        if (!response.IsSuccess)
+        {
+            return Result<IEnumerable<ProductViewModel>>.Failure(response.Error);
+        }
+        return Result<IEnumerable<ProductViewModel>>.Success(mapper.Map<IEnumerable<ProductViewModel>>(response.Value));
     }
 
     public async Task<Result<ProductViewModel>> GetProductByIdAsync(int id)

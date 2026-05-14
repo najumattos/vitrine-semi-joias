@@ -29,9 +29,14 @@ public class ProductsController(IProductService service) : Controller
         return View(result.Value);
     }
     [HttpGet]
-    public async Task<IActionResult> Category(CategoryEnum category)
+    public async Task<IActionResult> Category(CategoryEnum? category)
     {
-        var result = await service.GetProductByCategoryAsync(category);
+        if (!category.HasValue || !Enum.IsDefined(typeof(CategoryEnum), category.Value))
+        {
+            var allProducts = await service.GetAllProductsAsync();
+            return View("~/Views/Home/Index.cshtml", allProducts.IsSuccess ? allProducts.Value : Enumerable.Empty<ProductViewModel>());
+        }
+        var result = await service.GetProductByCategoryAsync(category.Value);
 
         if (!result.IsSuccess)
         {

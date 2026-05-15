@@ -11,8 +11,8 @@ using VitrineSemiJoias.Data;
 namespace VitrineSemiJoias.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260508182534_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260515154025_addSeedAdmin")]
+    partial class addSeedAdmin
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,6 +42,7 @@ namespace VitrineSemiJoias.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
@@ -59,12 +60,61 @@ namespace VitrineSemiJoias.Migrations
                         .HasDefaultValue(1);
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Products", (string)null);
+                });
+
+            modelBuilder.Entity("VitrineSemiJoias.Models.UserModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Profile")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Client");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "camila@admin.com",
+                            Name = "Camila Reis",
+                            PasswordHash = "123456",
+                            Profile = "0"
+                        });
                 });
 #pragma warning restore 612, 618
         }

@@ -56,9 +56,12 @@
             <button class="btn btn-outline-secondary me-2 d-md-none sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar"><i class="bi bi-list"></i></button>
             <a class="navbar-brand mb-0 h1" href="#">Painel</a>
         </div>
-        <div class="ms-auto d-flex align-items-center pe-3">
-            <span class="me-3 text-muted small">Administrador</span>
-        </div>
+        <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+            <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sair</span>
+            </button>
+        </form>
     </nav>
 
     <aside class="admin-sidebar" id="adminSidebar">

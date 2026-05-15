@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using VitrineSemiJoias.DTOs;
 using VitrineSemiJoias.Models;
 using VitrineSemiJoias.ViewModels;
 
@@ -8,7 +9,12 @@ public class ConfigurationProfile : Profile
 {
     public ConfigurationProfile()
     {
-        CreateMap<ProductModel, ProductViewModel>().ReverseMap();
+        CreateMap<ProductModel, ProductDto>().ReverseMap();
+        CreateMap<ProductDto, ProductViewModel>().ReverseMap();
+
+        CreateMap<UserModel, LoginDto>().ReverseMap();
+        CreateMap<LoginDto, LoginViewModel>().ReverseMap();
+        CreateMap<UserModel, AuthUserDto>().ReverseMap();
 
     }
 }

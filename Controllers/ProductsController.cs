@@ -108,9 +108,9 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
         return View(mapper.Map<ProductViewModel>(product.Value));
     }
     [HttpPost]
-    public async Task<IActionResult> DeleteConfirmed(int id)
+    public async Task<IActionResult> DeleteConfirmed(ProductViewModel product)
     {
-        var result = await service.DeleteProductAsync(id);
+        var result = await service.DeleteProductAsync(mapper.Map<ProductDto>(product));
 
         if (result.IsSuccess)
             return RedirectToAction(nameof(Index));

@@ -1,4 +1,4 @@
-@model VitrineSemiJoias.ViewModels.ProductViewModel
+ï»¿@model VitrineSemiJoias.ViewModels.ProductViewModel
 
 @{
     Layout = "_AdminLayout";
@@ -15,51 +15,52 @@
         <div class="card-header">
             <i class="fas fa-plus me-1"></i> Preencha os detalhes do produto
         </div>
-    <div class="card-body">
-        <form asp-action="Edit" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
+        <div class="card-body">
+            <form asp-action="Edit" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="ImageUrl" />
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label asp-for="Title" class="form-label">Título</label>
-                        <input asp-for="Title" class="form-control" placeholder="Ex: Colar de Pérolas" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Tï¿½tulo</label>
+                            <input asp-for="Title" class="form-control" placeholder="Ex: Colar de Pï¿½rolas" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">Descriï¿½ï¿½o</label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Description" class="form-label">Descrição</label>
-                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="Price" class="form-label">Preço</label>
-                            <div class="input-group">
-                                <span class="input-group-text">R$</span>
-                                <input asp-for="Price" class="form-control" />
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Price" class="form-label">Preï¿½o</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input asp-for="Price" class="form-control" />
+                                </div>
+                                <span asp-validation-for="Price" class="text-danger"></span>
                             </div>
-                            <span asp-validation-for="Price" class="text-danger"></span>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="StockQuantity" class="form-label">Estoque</label>
+                                <input asp-for="StockQuantity" class="form-control" type="number" />
+                                <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label asp-for="StockQuantity" class="form-label">Estoque</label>
-                            <input asp-for="StockQuantity" class="form-control" type="number" />
-                            <span asp-validation-for="StockQuantity" class="text-danger"></span>
-                        </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label asp-for="CategoryEnum" class="form-label">Categoria</label>
-                        <select asp-for="CategoryEnum" class="form-select"
-                                asp-items="Html.GetEnumSelectList<VitrineSemiJoias.Enums.CategoryEnum>()">
-                            <option value="">-- Selecione --</option>
-                        </select>
-                        <span asp-validation-for="CategoryEnum" class="text-danger"></span>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="CategoryEnum" class="form-label">Categoria</label>
+                            <select asp-for="CategoryEnum" class="form-select"
+                                    asp-items="Html.GetEnumSelectList<VitrineSemiJoias.Enums.CategoryEnum>()">
+                                <option value="">-- Selecione --</option>
+                            </select>
+                            <span asp-validation-for="CategoryEnum" class="text-danger"></span>
+                        </div>
 
                         <div class="mb-3">
                             <label class="form-label">Foto do Produto</label>
@@ -69,13 +70,19 @@
                                    class="form-control"
                                    accept="image/*" />
 
-                            <div class="form-text">Formatos aceitos: JPG, PNG, GIF, WebP (máx. 5MB) - opcional.</div>
+                            <div class="form-text">Formatos aceitos: JPG, PNG, GIF, WebP (mï¿½x. 5MB) - opcional.</div>
 
-                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            @{
+                                var imagemAtual = string.IsNullOrEmpty(Model.ImageUrl)
+                                ? string.Empty
+                                : Url.Content("~/" + Model.ImageUrl.Replace("\\", "/").TrimStart('/'));
+                            }
+
+                            @if (!string.IsNullOrEmpty(imagemAtual))
                             {
                                 <div class="mt-2">
                                     <small class="text-muted">Imagem atual:</small><br />
-                                    <img src="@Model.ImageUrl" style="max-width: 150px; border: 1px solid #ddd;" />
+                                    <img src="@imagemAtual" alt="Imagem atual do produto" style="max-width: 150px; border: 1px solid #ddd;" />
                                 </div>
                             }
 
@@ -83,20 +90,102 @@
                             <div id="fotoError" class="alert alert-danger mt-2" style="display:none;"></div>
                         </div>
 
-                    <div class="mb-3 form-check form-switch">
-                        <input class="form-check-input" type="checkbox" asp-for="IsAvailable" checked>
-                        <label class="form-check-label" asp-for="IsAvailable">Disponível para venda</label>
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" asp-for="IsAvailable" checked>
+                            <label class="form-check-label" asp-for="IsAvailable">Disponï¿½vel para venda</label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 </div>
 
 <div>
     <a asp-action="Index">Voltar para Lista</a>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileInput = document.getElementById('arquivoFoto');
+            const previewDiv = document.getElementById('fotoPreview');
+            const errorDiv = document.getElementById('fotoError');
+            const form = document.querySelector('form');
+
+            const MAX_FILE_SIZE = 5 * 1024 * 1024;
+            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+            if (!fileInput || !previewDiv || !errorDiv || !form) {
+                return;
+            }
+
+            fileInput.addEventListener('change', function () {
+                previewDiv.innerHTML = '';
+                errorDiv.style.display = 'none';
+                errorDiv.textContent = '';
+
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    return;
+                }
+
+                const file = fileInput.files[0];
+
+                if (file.size > MAX_FILE_SIZE) {
+                    errorDiv.textContent = 'Erro: Arquivo muito grande. Tamanho mÃ¡ximo: 5MB.';
+                    errorDiv.style.display = 'block';
+                    fileInput.value = '';
+                    return;
+                }
+
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    errorDiv.textContent = 'Erro: Tipo de arquivo nÃ£o permitido. Use JPG, PNG, GIF ou WebP.';
+                    errorDiv.style.display = 'block';
+                    fileInput.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.alt = 'Preview da nova foto';
+                    img.style.maxWidth = '200px';
+                    img.style.maxHeight = '200px';
+                    img.style.borderRadius = '4px';
+                    img.style.border = '1px solid #ddd';
+                    img.style.padding = '4px';
+
+                    previewDiv.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            form.addEventListener('submit', function (e) {
+                if (fileInput.files.length === 0) {
+                    return;
+                }
+
+                const file = fileInput.files[0];
+                if (file.size > MAX_FILE_SIZE) {
+                    e.preventDefault();
+                    errorDiv.textContent = 'Erro: Arquivo muito grande. Tamanho mÃ¡ximo: 5MB.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    e.preventDefault();
+                    errorDiv.textContent = 'Erro: Tipo de arquivo nÃ£o permitido.';
+                    errorDiv.style.display = 'block';
+                }
+            });
+        });
+    </script>
+}

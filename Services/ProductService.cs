@@ -30,14 +30,15 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
 
     }
 
-    public async Task<Result> DeleteProductAsync(int id)
+    public async Task<Result> DeleteProductAsync(ProductDto product)
     {
-        if (id <= 0)
+        if (product == null)                     
         {
             return Result.Failure("Produto inválido ou não informado.");
         }
-        var response = await repository.DeleteProductAsync(id);
-
+        
+        var response = await repository.DeleteProductAsync(product.Id);
+        await fileService.DeleteFileAsync(product.ImageUrl);
         if (!response.IsSuccess)
         {
             return Result.Failure(response.Error);
@@ -52,7 +53,7 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
         {
             return Result<IEnumerable<ProductDto>>.Failure(response.Error);
         }
-      
+
         return Result<IEnumerable<ProductDto>>.Success(mapper.Map<IEnumerable<ProductDto>>(response.Value));
     }
 
@@ -98,10 +99,18 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
             return Result<bool>.Failure("Produto não encontrado no banco de dados.");
         }
         var produtoOriginal = produtoBancoResult.Value;
+
+        produtoOriginal.Title = product.Title;
+        produtoOriginal.Description = product.Description;
+        produtoOriginal.Price = product.Price;
+        produtoOriginal.StockQuantity = product.StockQuantity;
+        produtoOriginal.CategoryEnum = product.CategoryEnum;
+        produtoOriginal.IsAvailable = product.IsAvailable;
+
         if (arquivoFoto != null && arquivoFoto.Length > 0)
         {
-            await AtualizarFoto(product, arquivoFoto);
-            produtoOriginal.ImageUrl = product.ImageUrl;
+            var novaImagem = await AtualizarFoto(produtoOriginal.ImageUrl, arquivoFoto);
+            produtoOriginal.ImageUrl = novaImagem;
         }
         var response = await repository.UpdateProductAsync(produtoOriginal);
         if (!response.IsSuccess)
@@ -113,18 +122,16 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
 
     }
 
-    private async Task<string> AtualizarFoto(ProductDto product, IFormFile novaFoto)
-    {             
-        //Se o usuário já tiver uma foto, a antiga é deletada
-        if (!string.IsNullOrEmpty(product.ImageUrl))
+    private async Task<string> AtualizarFoto(string caminhoAtual, IFormFile novaFoto)
+    {
+        // Se houver uma foto antiga, tenta removê-la antes de salvar a nova
+        if (!string.IsNullOrEmpty(caminhoAtual))
         {
-            await fileService.DeleteFileAsync(product.ImageUrl);
+            await fileService.DeleteFileAsync(caminhoAtual);
         }
 
         var novoPath = await fileService.SaveFileAsync(novaFoto, "img/products");
 
-        product.ImageUrl = novoPath;
-
-        return fileService.GetFileUrl(novoPath);
+        return novoPath;
     }
 }

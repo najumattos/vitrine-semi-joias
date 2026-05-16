@@ -1,15 +1,16 @@
-﻿using VitrineSemiJoias.Common;
+﻿
+using VitrineSemiJoias.Common;
+using VitrineSemiJoias.DTOs;
 using VitrineSemiJoias.Enums;
-using VitrineSemiJoias.ViewModels;
 
 namespace VitrineSemiJoias.Services.Interfaces;
 
 public interface IProductService
 {
-    Task<Result<IEnumerable<ProductViewModel>>> GetAllProductsAsync();
-    Task<Result<ProductViewModel>> GetProductByIdAsync(int id);
-    Task<Result<IEnumerable<ProductViewModel>>> GetProductByCategoryAsync(CategoryEnum category);
-    Task <Result<ProductViewModel>> AddProductAsync(ProductViewModel product, IFormFile arquivoFoto);
-    Task<Result> UpdateProductAsync(ProductViewModel product, IFormFile arquivoFoto);        
+    Task<Result<IEnumerable<ProductDto>>> GetAllProductsAsync();
+    Task<Result<ProductDto>> GetProductByIdAsync(int id);
+    Task<Result<IEnumerable<ProductDto>>> GetProductByCategoryAsync(CategoryEnum category);
+    Task <Result<ProductDto>> AddProductAsync(ProductDto product, IFormFile arquivoFoto);
+    Task<Result<bool>> UpdateProductAsync(ProductDto product, IFormFile arquivoFoto);        
     Task<Result> DeleteProductAsync(int id);
 }

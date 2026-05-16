@@ -1,7 +1,6 @@
 ﻿using VitrineSemiJoias.Common;
 using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Models;
-using VitrineSemiJoias.ViewModels;
 
 namespace VitrineSemiJoias.Repository.Interfaces;
 

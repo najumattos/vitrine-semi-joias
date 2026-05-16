@@ -4,7 +4,6 @@ using VitrineSemiJoias.Data;
 using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Models;
 using VitrineSemiJoias.Repository.Interfaces;
-using VitrineSemiJoias.ViewModels;
 
 namespace VitrineSemiJoias.Repository;
 

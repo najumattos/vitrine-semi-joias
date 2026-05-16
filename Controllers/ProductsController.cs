@@ -1,21 +1,22 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using VitrineSemiJoias.DTOs;
 using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Services.Interfaces;
 using VitrineSemiJoias.ViewModels;
 
 namespace VitrineSemiJoias.Controllers;
 
-public class ProductsController(IProductService service) : Controller
+public class ProductsController(IProductService service, IMapper mapper) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index()
     {
         var result = await service.GetAllProductsAsync();
-
         if (!result.IsSuccess)
             return View(Enumerable.Empty<ProductViewModel>());
 
-        return View(result.Value);
+        return View(mapper.Map<IEnumerable<ProductViewModel>>(result.Value));
     }
      
     [HttpGet]
@@ -26,7 +27,7 @@ public class ProductsController(IProductService service) : Controller
         if (!result.IsSuccess)
             return NotFound(result.Error); 
 
-        return View(result.Value);
+        return View(mapper.Map<ProductViewModel>(result.Value));
     }
     [HttpGet]
     public async Task<IActionResult> Category(CategoryEnum? category)
@@ -45,7 +46,7 @@ public class ProductsController(IProductService service) : Controller
             return View("~/Views/Home/Index.cshtml", Enumerable.Empty<ProductViewModel>());
         }
 
-        return View("~/Views/Home/Index.cshtml", result.Value);
+        return View("~/Views/Home/Index.cshtml", mapper.Map<IEnumerable<ProductViewModel>>(result.Value));
     }
 
     [HttpGet]
@@ -55,14 +56,14 @@ public class ProductsController(IProductService service) : Controller
     public async Task<IActionResult> Create(ProductViewModel product, IFormFile arquivoFoto)
     {
         if (!ModelState.IsValid) return View(product);
-
-        var result = await service.AddProductAsync(product, arquivoFoto);
+        ;
+        var result = await service.AddProductAsync(mapper.Map<ProductDto>(product), arquivoFoto);
 
         if (result.IsSuccess)
             return RedirectToAction(nameof(Index)); 
 
         ModelState.AddModelError(string.Empty, result.Error);
-        return View(product);
+        return View(mapper.Map<ProductViewModel>(result.Value));
     }
 
     [HttpGet]
@@ -72,21 +73,24 @@ public class ProductsController(IProductService service) : Controller
 
         if (!result.IsSuccess)
             return NotFound();
-
-        return View(result.Value);
+        var productVM = mapper.Map<ProductViewModel>(result.Value);
+        return View(productVM);
     }
 
     [HttpPost]
     public async Task<IActionResult> Edit(ProductViewModel product, IFormFile arquivoFoto)
     {
         if (!ModelState.IsValid) return View(product);
+        var productDto = mapper.Map<ProductDto>(product);
+        var result = await service.UpdateProductAsync(productDto, arquivoFoto);
 
-        var result = await service.UpdateProductAsync(product, arquivoFoto);
-
-        if (result.IsSuccess)
+        if (result.IsSuccess){
             return RedirectToAction(nameof(Index));
+        }
+        
 
         ModelState.AddModelError(string.Empty, result.Error);
+        var productVM = mapper.Map<ProductViewModel>(result);
         return View(product);
     }
 
@@ -99,9 +103,9 @@ public class ProductsController(IProductService service) : Controller
         if (product == null){
             return NotFound();
         }
+
         
-        ProductViewModel model = product.Value;
-        return View(model);
+        return View(mapper.Map<ProductViewModel>(product.Value));
     }
     [HttpPost]
     public async Task<IActionResult> DeleteConfirmed(int id)

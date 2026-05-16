@@ -1,20 +1,20 @@
 ﻿using AutoMapper;
 using VitrineSemiJoias.Common;
+using VitrineSemiJoias.DTOs;
 using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Models;
 using VitrineSemiJoias.Repository.Interfaces;
 using VitrineSemiJoias.Services.Interfaces;
-using VitrineSemiJoias.ViewModels;
 
 namespace VitrineSemiJoias.Services;
 
 public class ProductService(IProductRepository repository, IMapper mapper, IFileService fileService) : IProductService
 {
-    public async Task<Result<ProductViewModel>> AddProductAsync(ProductViewModel product, IFormFile arquivoFoto)
+    public async Task<Result<ProductDto>> AddProductAsync(ProductDto product, IFormFile arquivoFoto)
     {
         if (product == null)
         {
-            return Result<ProductViewModel>.Failure("Produto inválido ou não informado.");
+            return Result<ProductDto>.Failure("Produto inválido ou não informado.");
         }
         if (arquivoFoto != null)
         {
@@ -24,9 +24,9 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
 
         if (!response.IsSuccess)
         {
-            return Result<ProductViewModel>.Failure(response.Error);
+            return Result<ProductDto>.Failure(response.Error);
         }
-        return Result<ProductViewModel>.Success(mapper.Map<ProductViewModel>(response.Value));
+        return Result<ProductDto>.Success(mapper.Map<ProductDto>(response.Value));
 
     }
 
@@ -45,69 +45,76 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
         return Result.Success();
     }
 
-    public async Task<Result<IEnumerable<ProductViewModel>>> GetAllProductsAsync()
+    public async Task<Result<IEnumerable<ProductDto>>> GetAllProductsAsync()
     {
         var response = await repository.GetAllProductsAsync();
         if (!response.IsSuccess)
         {
-            return Result<IEnumerable<ProductViewModel>>.Failure(response.Error);
+            return Result<IEnumerable<ProductDto>>.Failure(response.Error);
         }
-        var productsVM = mapper.Map<IEnumerable<ProductViewModel>>(response.Value);
-
-        return Result<IEnumerable<ProductViewModel>>.Success(productsVM);
+      
+        return Result<IEnumerable<ProductDto>>.Success(mapper.Map<IEnumerable<ProductDto>>(response.Value));
     }
 
-    public async Task<Result<IEnumerable<ProductViewModel>>> GetProductByCategoryAsync(CategoryEnum category)
+    public async Task<Result<IEnumerable<ProductDto>>> GetProductByCategoryAsync(CategoryEnum category)
     {
         if (!Enum.IsDefined(typeof(CategoryEnum), category))
         {
-            return Result<IEnumerable<ProductViewModel>>.Failure("Categoria inválida ou não informada.");
+            return Result<IEnumerable<ProductDto>>.Failure("Categoria inválida ou não informada.");
         }
         var response = await repository.GetProductByCategoryAsync(category);
 
         if (!response.IsSuccess)
         {
-            return Result<IEnumerable<ProductViewModel>>.Failure(response.Error);
+            return Result<IEnumerable<ProductDto>>.Failure(response.Error);
         }
-        return Result<IEnumerable<ProductViewModel>>.Success(mapper.Map<IEnumerable<ProductViewModel>>(response.Value));
+        return Result<IEnumerable<ProductDto>>.Success(mapper.Map<IEnumerable<ProductDto>>(response.Value));
     }
 
-    public async Task<Result<ProductViewModel>> GetProductByIdAsync(int id)
+    public async Task<Result<ProductDto>> GetProductByIdAsync(int id)
     {
         if (id <= 0)
         {
-            return Result<ProductViewModel>.Failure("Produto inválido ou não informado.");
+            return Result<ProductDto>.Failure("Produto inválido ou não informado.");
         }
         var response = await repository.GetProductByIdAsync(id);
 
         if (!response.IsSuccess)
         {
-            return Result<ProductViewModel>.Failure(response.Error);
+            return Result<ProductDto>.Failure(response.Error);
         }
-        return Result<ProductViewModel>.Success(mapper.Map<ProductViewModel>(response.Value));
+        return Result<ProductDto>.Success(mapper.Map<ProductDto>(response.Value));
     }
 
-    public async Task<Result> UpdateProductAsync(ProductViewModel product, IFormFile arquivoFoto)
+    public async Task<Result<bool>> UpdateProductAsync(ProductDto product, IFormFile arquivoFoto)
     {
         if (product == null)
         {
-            return Result.Failure("Produto inválido ou não informado.");
+            return Result<bool>.Failure("Produto inválido ou não informado.");
         }
-        if (arquivoFoto != null)
+        var produtoBancoResult = await repository.GetProductByIdAsync(product.Id);
+        if (!produtoBancoResult.IsSuccess || produtoBancoResult.Value == null)
+        {
+            return Result<bool>.Failure("Produto não encontrado no banco de dados.");
+        }
+        var produtoOriginal = produtoBancoResult.Value;
+        if (arquivoFoto != null && arquivoFoto.Length > 0)
         {
             await AtualizarFoto(product, arquivoFoto);
+            produtoOriginal.ImageUrl = product.ImageUrl;
         }
-        var response = await repository.UpdateProductAsync(mapper.Map<ProductModel>(product));
-
+        var response = await repository.UpdateProductAsync(produtoOriginal);
         if (!response.IsSuccess)
         {
-            return Result.Failure(response.Error);
+            return Result<bool>.Failure(response.Error);
         }
-        return Result.Success();
+
+        return Result<bool>.Success(true);
+
     }
 
-    private async Task<string> AtualizarFoto(ProductViewModel product, IFormFile novaFoto)
-    {              
+    private async Task<string> AtualizarFoto(ProductDto product, IFormFile novaFoto)
+    {             
         //Se o usuário já tiver uma foto, a antiga é deletada
         if (!string.IsNullOrEmpty(product.ImageUrl))
         {
@@ -116,10 +123,8 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
 
         var novoPath = await fileService.SaveFileAsync(novaFoto, "img/products");
 
-        // 3. Atualiza o caminho da string no banco de dados
         product.ImageUrl = novoPath;
 
-        // 4. Retornamos a URL completa para o Front-end já exibir a imagem
         return fileService.GetFileUrl(novoPath);
     }
 }

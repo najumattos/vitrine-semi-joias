@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Mvc;
 using VitrineSemiJoias.Services.Interfaces;
 using VitrineSemiJoias.ViewModels;
 using AutoMapper;
@@ -33,33 +30,16 @@ public class AuthController(IAuthService service, IMapper mapper) : Controller
 
         if (!result.IsSuccess)
         {
-            ModelState.AddModelError(string.Empty, "E-mail ou senha inválidos.");
+            ModelState.AddModelError(string.Empty, result.Error);
             return View(loginVM);
-        }
-
-        await SetupAuthenticationCookie(result.Value);
+        }     
         return RedirectToAction("Index", "Products");
     }
 
     [HttpPost]
     public async Task<IActionResult> Logout()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await service.Logout();
         return RedirectToAction("Login");
-    }
-
-    private async Task SetupAuthenticationCookie(AuthUserDto user)
-    {
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Name),
-            new Claim(ClaimTypes.Email, user.Email)
-        };
-
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var principal = new ClaimsPrincipal(identity);
-
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-    }
+    }    
 }

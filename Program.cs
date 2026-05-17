@@ -1,20 +1,14 @@
 using DotNetEnv;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using VitrineSemiJoias.Configurations;
 using VitrineSemiJoias.Data;
+using VitrineSemiJoias.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 Env.Load();
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
 
-// CONFIGURAÇÃO DA AUTENTICAÇÃO POR COOKIES
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Auth/Login"; // Rota para onde redireciona se não estiver logado
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(20); // Tempo de expiração do cookie
-    });
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
@@ -23,6 +17,20 @@ var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION")
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+builder.Services.AddIdentity<UserModel, IdentityRole<int>>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Auth/Login";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+});
 
 builder.Services.AddSmartServices();
 

@@ -1,24 +1,31 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using VitrineSemiJoias.Common;
 using VitrineSemiJoias.DTOs;
-using VitrineSemiJoias.Repository.Interfaces;
+using VitrineSemiJoias.Models;
 using VitrineSemiJoias.Services.Interfaces;
 
 namespace VitrineSemiJoias.Services;
 
-public class AuthService(IUserRepository repository, IMapper mapper) : IAuthService
-{   
+public class AuthService(UserManager<UserModel> userManager, SignInManager<UserModel> signInManager, IMapper mapper) : IAuthService
+{
+    public async Task Logout()
+    {
+        await signInManager.SignOutAsync();
+    }
+
     public async Task<Result<AuthUserDto>> ValidateUserAsync(LoginDto loginDto)
     {
         if (loginDto == null) return Result<AuthUserDto>.Failure("Dados inválidos.");
 
-        var user = await repository.GetUserByEmailAsync(loginDto.Email);
+        var user = await userManager.FindByEmailAsync(loginDto.Email);
 
         if (user == null)
             return Result<AuthUserDto>.Failure("Usuário não encontrado.");
-      
-        // Comparação de senha (lembre-se de evoluir para BCrypt depois!)
-        if (user.PasswordHash != loginDto.Password)
+
+        var signInResult = await signInManager.PasswordSignInAsync(user, loginDto.Password, isPersistent: loginDto.IsPersistent, lockoutOnFailure: false);
+       
+        if (!signInResult.Succeeded)
             return Result<AuthUserDto>.Failure("Senha ou email incorretos.");
 
         var authDto = mapper.Map<AuthUserDto>(user);

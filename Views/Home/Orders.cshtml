@@ -72,9 +72,13 @@
                             <span>Total</span>
                             <strong>R$ @Model.TotalAmount.ToString("F2")</strong>
                         </div>
-                        <button type="button" class="btn btn-primary w-100" disabled>
-                            Finalização no WhatsApp em breve
-                        </button>
+                        <form asp-controller="Home" asp-action="FinalizeOrder" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-whatsapp"></i> Finalizar no WhatsApp
+                            </button>
+                        </form>
+                      
                     </div>
                 </div>
             </div>

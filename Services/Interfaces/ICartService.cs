@@ -7,4 +7,5 @@ public interface ICartService
 {
     Task<Result> AddItemAsync(int productId);
     Task<Result<IReadOnlyCollection<CartItemDto>>> GetItemsAsync();
+    Task<Result<string>> GenerateWhatsAppMessageAsync();
 }

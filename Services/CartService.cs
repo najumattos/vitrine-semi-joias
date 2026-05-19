@@ -1,3 +1,4 @@
+using System.Text;
 using VitrineSemiJoias.Common;
 using VitrineSemiJoias.DTOs;
 using VitrineSemiJoias.Services.Interfaces;
@@ -67,5 +68,38 @@ public class CartService(IProductService productService, IHttpContextAccessor ht
     private static IEnumerable<CartItemDto> GetSessionItems(ISession session)
     {
         return session.GetJson<List<CartItemDto>>(SessionKey) ?? [];
+    }
+
+    public async Task<Result<string>> GenerateWhatsAppMessageAsync()
+    {
+        var cartResult = await GetItemsAsync();
+        if (!cartResult.IsSuccess || cartResult.Value == null || !cartResult.Value.Any())
+        {
+            return Result<string>.Failure("Carrinho vazio. Não é possível gerar a mensagem.");
+        }
+
+        var items = cartResult.Value;
+        var subtotal = items.Sum(item => item.Price);
+        var currentDateTime = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+        var whatsappNumber = "5514981544857";
+
+        var messageBuilder = new StringBuilder();
+        messageBuilder.AppendLine("Olá Camila, aqui está o resumo do pedido montado através do catalogo virtual");
+        messageBuilder.AppendLine("-----------------------");
+        messageBuilder.AppendLine($"SubTotal: R$ {subtotal:F2}");
+        messageBuilder.AppendLine($"Horario: {currentDateTime}");
+
+        foreach (var item in items)
+        {
+            messageBuilder.AppendLine("-----------------------");
+            messageBuilder.AppendLine($"# {item.JewelryCode} | {item.Title}");
+            messageBuilder.AppendLine($"R$ {item.Price:F2}");
+        }
+
+        var messageText = messageBuilder.ToString();
+        var escapedMessage = Uri.EscapeDataString(messageText);
+        var whatsappUrl = $"https://wa.me/{whatsappNumber}?text={escapedMessage}";
+
+        return Result<string>.Success(whatsappUrl);
     }
 }

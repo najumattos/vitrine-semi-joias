@@ -59,6 +59,21 @@ namespace VitrineSemiJoias.Controllers;
         return RedirectToAction(nameof(Orders));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> FinalizeOrder()
+    {
+        var messageResult = await cartService.GenerateWhatsAppMessageAsync();
+
+        if (!messageResult.IsSuccess || string.IsNullOrWhiteSpace(messageResult.Value))
+        {
+            TempData["ErrorMessage"] = messageResult.Error ?? "Erro ao gerar o link do WhatsApp.";
+            return RedirectToAction(nameof(Orders));
+        }
+
+        return Redirect(messageResult.Value);
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

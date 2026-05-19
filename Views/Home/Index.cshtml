@@ -4,25 +4,75 @@
 
 @{
     ViewData["Title"] = "Vitrine de Produtos";
+    var selectedCategory = Context.Request.Query["category"].ToString();
 }
 
-<div class="container-fluid py-5">
-    <div class="text-center mb-5">
-        <h1 class="display-5 fw-bold" style="color: #343a40;">Nossos Produtos</h1>
-        <p class="lead text-muted">Conheça nossa coleção exclusiva de joias e acessórios</p>
+<div class="container-fluid py-5 bg-white border-bottom">
+    <div class="container text-center py-3">
+        <h1 class="display-4 fw-normal text-dark mb-2" style="font-family: 'Playfair Display', 'Georgia', serif; letter-spacing: 2px;">
+            Camila Reis
+        </h1>
+        <span class="text-uppercase small fw-bold text-muted tracking-widest d-block mb-4" style="letter-spacing: 4px; font-size: 0.75rem;">
+            Semijoias & Acessórios
+        </span>
+
+        <div class="row justify-content-center g-4 my-2">
+            <div class="col-6 col-sm-4 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2 text-secondary small">
+                    <i class="bi bi-gem text-dark fs-6"></i>
+                    <span class="fw-medium">Loja Online</span>
+                </div>
+            </div>
+            <div class="col-6 col-sm-4 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2 text-secondary small">
+                    <i class="bi bi-calendar-heart text-dark fs-6"></i>
+                    <span class="fw-medium">Atendimento Agendado</span>
+                </div>
+            </div>
+            <div class="col-6 col-sm-4 col-md-3">
+                <div class="d-flex align-items-center justify-content-center gap-2 text-secondary small">
+                    <i class="bi bi-truck text-dark fs-6"></i>
+                    <span class="fw-medium">Envio Seguro via SEDEX</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="https://www.instagram.com/camilareissemijoias/" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="btn btn-outline-dark btn-sm rounded-pill px-4 btn-instagram-custom">
+                <i class="bi bi-instagram me-2"></i>camilareissemijoias
+            </a>
+        </div>
     </div>
-<div class="mb-5">
-    <form asp-controller="Products" asp-action="Category" method="get" class="d-flex align-items-center gap-2">
-        <label for="category" class="fw-bold">Filtrar por Categoria:</label>
-        <select name="category"
-                id="category"
-                class="form-select w-auto"
-                onchange="this.form.submit()"
-                asp-items="Html.GetEnumSelectList<CategoryEnum>()">
-            <option value="">Todas as Categorias</option>
-        </select>
-    </form>
 </div>
+
+<div class="container py-5">
+    
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-5 p-3 bg-light rounded-3 border">
+        <div>
+            <h3 class="fs-5 fw-bold text-dark mb-0">Conheça Nossas Peças</h3>
+            <p class="text-muted small mb-0">Selecione uma categoria para filtrar o mostruário</p>
+        </div>
+        <form asp-controller="Products" asp-action="Category" method="get" class="w-100 w-sm-auto">
+            <div class="d-flex align-items-center gap-2 justify-content-sm-end">
+                <label for="category" class="text-secondary small fw-semibold text-nowrap mb-0">Filtrar por:</label>
+                <select name="category"
+                        id="category"
+                        class="form-select form-select-sm rounded-2 border-secondary-subtle select-filter-custom"
+                        onchange="this.form.submit()">
+                    <option value="" selected="@(string.IsNullOrEmpty(selectedCategory) ? "selected" : null)">Todas as Categorias</option>
+                    @foreach (var category in Enum.GetValues<CategoryEnum>())
+                    {
+                        var categoryValue = ((int)category).ToString();
+                        <option value="@categoryValue" selected="@(selectedCategory == categoryValue ? "selected" : null)">@category</option>
+                    }
+                </select>
+            </div>
+        </form>
+    </div>
+
     @if (Model?.Any() == true)
     {
         <div class="row g-4">
@@ -30,59 +80,64 @@
             {
                 @if (product.IsAvailable)
                 {
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="card h-100 border-1 shadow-sm" style="border-color: #e6a1c2 !important;">
-                            <!-- Imagem do Produto -->
-                            <div class="position-relative overflow-hidden" style="height: 300px; background: #f6f6f7;">
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden product-card">
+                            
+                            <div class="position-relative overflow-hidden bg-light" style="height: 320px;">
                                 @if (!string.IsNullOrEmpty(product.ImageUrl))
                                 {
-                                    <img src="~/@product.ImageUrl" alt="@product.Title" class="card-img-top img-fluid" style="object-fit: cover; width: 100%; height: 100%;" />
+                                    <img src="~/@product.ImageUrl" alt="@product.Title" class="w-100 h-100 product-img" style="object-fit: cover;" />
                                 }
                                 else
                                 {
-                                    <div class="d-flex align-items-center justify-content-center h-100">
-                                        <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                                    <div class="d-flex flex-column align-items-center justify-content-center h-100 text-muted bg-neutral-subtle">
+                                        <i class="bi bi-image fs-1 mb-2 text-black-50"></i>
+                                        <span class="small font-monospace text-uppercase" style="font-size: 10px;">Imagem pendente</span>
                                     </div>
                                 }
 
-                                <!-- Badge de Categoria -->
                                 <div class="position-absolute top-0 end-0 m-3">
-                                    <span class="badge rounded-pill px-3 py-2" style="background: #fce4ec; color: #e64e96; font-weight: 600;">
-                                        @product.CategoryEnum
+                                    <span class="badge rounded-pill px-3 py-2 border font-sm shadow-sm" style="background-color: rgba(255, 255, 255, 0.95); color: #e64e96; border-color: #fce4ec !important; fw-semibold">
+                                        <i class="bi bi-tag me-1"></i>@product.CategoryEnum
                                     </span>
                                 </div>
                             </div>
 
-                            <!-- Card Body -->
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title fw-bold" style="color: #343a40; line-height: 1.4;">
+                            <div class="card-body d-flex flex-column p-4 bg-white">
+                                <span class="text-muted font-monospace d-block mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">#@product.JewelryCode</span>
+                                <h5 class="card-title fw-bold text-dark fs-6 mb-2 text-truncate-two-lines">
                                     @product.Title
                                 </h5>
 
                                 @if (!string.IsNullOrEmpty(product.Description))
                                 {
-                                    <p class="card-text text-muted small flex-grow-1">
+                                    <p class="card-text text-muted small flex-grow-1 text-truncate-three-lines mb-4">
                                         @product.Description
                                     </p>
                                 }
+                                else
+                                {
+                                    <div class="flex-grow-1 mb-4"></div>
+                                }
 
-                                <!-- Preço e Botão -->
-                                <div class="d-flex align-items-end justify-content-between mt-3">
+                                <div class="d-flex align-items-center justify-content-between pt-3 border-top border-light mt-auto">
                                     <div>
-                                        <p class="mb-0 small text-muted">Preço</p>
-                                        <h4 class="mb-0 fw-bold" style="color: #e64e96;">
+                                        <span class="d-block text-muted text-uppercase fw-semibold" style="font-size: 9px; letter-spacing: 0.5px;">Valor</span>
+                                        <h4 class="mb-0 fw-bold" style="color: #e64e96; font-size: 1.2rem;">
                                             R$ @product.Price.ToString("F2")
                                         </h4>
                                     </div>
-                                    <button class="btn btn-sm" style="background: #e64e96; color: white; border: none;" data-bs-toggle="modal" data-bs-target="#productModal" 
+                                    <button class="btn btn-dark btn-sm rounded-2 px-3 fw-semibold shadow-sm d-inline-flex align-items-center gap-1.5 fs-7 py-2" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#productModal" 
                                             data-id="@product.Id"
                                             data-title="@product.Title"
                                             data-jewelrycode="@product.JewelryCode"
                                             data-category="@product.CategoryEnum"
                                             data-price="@product.Price.ToString("F2")"
                                             data-description="@product.Description"
-                                            data-image="@product.ImageUrl">
-                                        <i class="bi bi-eye"></i> Ver
+                                            data-image="@(string.IsNullOrEmpty(product.ImageUrl) ? "" : Url.Content("~/" + product.ImageUrl))">
+                                        <i class="bi bi-eye"></i> Detalhes
                                     </button>
                                 </div>
                             </div>
@@ -94,75 +149,55 @@
     }
     else
     {
-        <div class="alert alert-info text-center" role="alert">
-            <i class="bi bi-info-circle"></i> Nenhum produto disponível no momento.
+        <div class="alert alert-light border text-center p-5 rounded-4 shadow-sm" role="alert">
+            <i class="bi bi-inbox fs-1 d-block mb-3 text-muted"></i>
+            <h4 class="fw-bold text-dark fs-5">Nenhum item encontrado</h4>
+            <p class="text-secondary small mb-0">Não existem joias disponíveis nesta categoria ou mostruário no momento.</p>
         </div>
     }
 </div>
 
-<style>
-    .card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 24px rgba(230, 78, 150, 0.15) !important;
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    @@media (max-width: 767.98px) {
-        .display-5 {
-            font-size: 2rem;
-        }
-    }
-</style>
-
-<!-- Modal do Produto -->
 <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content" style="border: none; border-radius: 0;">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
             <div class="modal-body p-0">
-                <div class="row g-0 h-100">
-                    <!-- Imagem à Esquerda -->
-                    <div class="col-md-6 d-flex align-items-center justify-content-center overflow-hidden" style="background: #f6f6f7; min-height: 500px;">
-                        <img id="modalProductImage" src="" alt="" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;" />
+                <div class="row g-0">
+                    
+                    <div class="col-md-6 bg-light d-flex align-items-center justify-content-center overflow-hidden position-relative" style="min-height: 380px; max-height: 500px;">
+                        <img id="modalProductImage" src="" alt="" class="w-100 h-100" style="object-fit: cover;" />
                     </div>
 
-                    <!-- Detalhes à Direita -->
-                    <div class="col-md-6 p-5" style="background: #2c3e50; color: #fff;">
-                        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="col-md-6 p-4 p-sm-5 bg-white d-flex flex-column justify-content-between position-relative">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
 
-                        <!-- Título -->
-                        <h2 id="modalProductTitle" class="fw-bold mb-2"></h2>
-                        <p class="text-light mb-4">Código da peça: <strong id="modalJewelryCode"></strong></p>
+                        <div>
+                            <span class="text-muted font-monospace d-block mb-1" style="font-size: 0.75rem;">Código: <span id="modalJewelryCode" class="fw-bold"></span></span>
+                            <h2 id="modalProductTitle" class="fw-bold text-dark h4 mb-3"></h2>
+                            
+                            <div class="d-flex flex-wrap gap-2 mb-4">
+                                <span class="badge rounded-pill px-3 py-1.5 border" style="background-color: #fce4ec; color: #e64e96; border-color: #fce4ec; font-weight: 600;" id="modalProductCategory"></span>
+                            </div>
 
-                        <!-- Categoria -->
-                        <div class="d-flex align-items-center gap-2 mb-4">
-                            <span class="badge rounded-pill px-3 py-2" style="background: #fce4ec; color: #e64e96; font-weight: 600;" id="modalProductCategory"></span>
-                            <span class="badge rounded-pill px-3 py-2" style="background: #fce4ec; color: #e64e96; font-weight: 600;" id="modalIsLastUnits"></span>
+                            <div class="pe-md-2 mb-4" style="max-height: 140px; overflow-y: auto;">
+                                <p id="modalProductDescription" class="text-secondary small mb-0" style="line-height: 1.6;"></p>
+                            </div>
                         </div>
 
-                        <!-- Descrição -->
-                        <p id="modalProductDescription" class="text-light mb-4" style="line-height: 1.6; font-size: 0.95rem;"></p>
+                        <div class="pt-3 border-top border-light">
+                            <div class="d-flex align-items-baseline justify-content-between mb-3">
+                                <span class="text-muted small">Valor da Peça</span>
+                                <h3 id="modalProductPrice" class="fw-bold mb-0" style="color: #e64e96;">R$ 0,00</h3>
+                            </div>
 
-                        <!-- Preço em Destaque -->
-                        <div class="mb-4">
-                            <p class="text-muted small mb-1">Preço</p>
-                            <h3 id="modalProductPrice" class="fw-bold" style="color: #e64e96; font-size: 2rem;">R$ 0,00</h3>
-                        </div>                       
+                            <form asp-controller="Home" asp-action="AddToCart" method="post" id="addToCartForm">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" id="modalProductIdInput" name="productId" value="" />
+                                <button type="submit" id="addToCartButton" class="btn btn-dark w-100 py-2.5 rounded-3 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2 bg-pink-action border-0">
+                                    <i class="bi bi-cart-plus fs-5"></i> Adicionar ao Carrinho
+                                </button>
+                            </form>
+                        </div>
 
-                        <!-- Botão de Ação -->
-                        <form asp-controller="Home" asp-action="AddToCart" method="post">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" id="modalProductIdInput" name="productId" value="" />
-                            <button type="submit" class="btn w-100" style="background: #e64e96; color: white; border: none; padding: 0.75rem; font-weight: 600; border-radius: 4px;">
-                                <i class="bi bi-cart"></i> Adicionar ao Carrinho
-                            </button>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -170,15 +205,63 @@
     </div>
 </div>
 
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cartToast" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div id="cartToastMessage" class="toast-body">Produto adicionado ao pedido</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilização e Efeitos dos Cards de Produtos */
+    .product-card {
+        transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border: 1px solid rgba(0,0,0,0.05) !important;
+    }
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 30px rgba(230, 78, 150, 0.08) !important;
+    }
+    .product-img {
+        transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    .product-card:hover .product-img {
+        transform: scale(1.04);
+    }
+
+    /* Limitadores de Linha para Manter Alinhamento Estético */
+    .text-truncate-two-lines {
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8rem;
+    }
+    .text-truncate-three-lines {
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; height: 3.2rem;
+    }
+
+    /* Customizações Gerais */
+    .btn-instagram-custom:hover { background-color: #000; color: #fff; }
+    .select-filter-custom { min-width: 200px; }
+    .bg-pink-action { background-color: #e64e96 !important; transition: background-color 0.2s; }
+    .bg-pink-action:hover { background-color: #c93b7f !important; }
+    .fs-7 { font-size: 0.825rem; }
+    .bg-neutral-subtle { background-color: #f1f2f4; }
+    .font-sm { font-size: 0.75rem; }
+</style>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const productModal = document.getElementById('productModal');
+        const addToCartForm = document.getElementById('addToCartForm');
+        const addToCartButton = document.getElementById('addToCartButton');
+        const cartToastElement = document.getElementById('cartToast');
+        const cartToastMessage = document.getElementById('cartToastMessage');
+        const cartToast = cartToastElement ? bootstrap.Toast.getOrCreateInstance(cartToastElement, { delay: 2500 }) : null;
         
         if (productModal) {
             productModal.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
                 
-                // Pega os atributos data-* do botão
                 const id = button.getAttribute('data-id');
                 const title = button.getAttribute('data-title');
                 const jewelryCode = button.getAttribute('data-jewelrycode');
@@ -187,15 +270,70 @@
                 const description = button.getAttribute('data-description');
                 const image = button.getAttribute('data-image');
                 
-                // Preenche o modal com os dados
                 document.getElementById('modalProductTitle').textContent = title;
-                document.getElementById('modalJewelryCode').textContent = jewelryCode;
+                document.getElementById('modalJewelryCode').textContent = jewelryCode || 'N/A';
                 document.getElementById('modalProductCategory').textContent = category;
-                document.getElementById('modalProductDescription').textContent = description || '';
+                document.getElementById('modalProductDescription').textContent = description || 'Sem descrição comercial disponível para esta peça.';
                 document.getElementById('modalProductPrice').textContent = 'R$ ' + price;
-                document.getElementById('modalProductImage').src = image || '/images/placeholder.png';
-                document.getElementById('modalProductImage').alt = title;
                 document.getElementById('modalProductIdInput').value = id;
+                
+                const modalImg = document.getElementById('modalProductImage');
+                modalImg.src = image ? image : '@Url.Content("~/images/placeholder.png")';
+                modalImg.alt = title;
+            });
+        }
+
+        if (addToCartForm) {
+            addToCartForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const submitButton = addToCartButton;
+                const modalInstance = bootstrap.Modal.getOrCreateInstance(productModal);
+                const originalButtonHtml = submitButton ? submitButton.innerHTML : '';
+
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span>Adicionando...</span>';
+                }
+
+                try {
+                    const response = await fetch(addToCartForm.action, {
+                        method: 'POST',
+                        body: new FormData(addToCartForm),
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const payload = await response.json();
+
+                    if (!response.ok || !payload.success) {
+                        throw new Error(payload.message || 'Não foi possível adicionar o produto ao pedido.');
+                    }
+
+                    if (cartToastMessage) {
+                        cartToastMessage.textContent = payload.message || 'Produto adicionado ao pedido';
+                    }
+
+                    modalInstance.hide();
+
+                    if (cartToast) {
+                        cartToast.show();
+                    }
+                } catch (error) {
+                    if (cartToastMessage) {
+                        cartToastMessage.textContent = error.message || 'Não foi possível adicionar o produto ao pedido.';
+                    }
+
+                    if (cartToast) {
+                        cartToast.show();
+                    }
+                } finally {
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalButtonHtml;
+                    }
+                }
             });
         }
     });

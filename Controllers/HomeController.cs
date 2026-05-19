@@ -30,10 +30,10 @@ namespace VitrineSemiJoias.Controllers;
         if (!cartResult.IsSuccess)
         {
             TempData["ErrorMessage"] = cartResult.Error;
-            return View(new OrdersViewModel());
+            return View(new OrderViewModel());
         }
 
-        var viewModel = new OrdersViewModel
+        var viewModel = new OrderViewModel
         {
             Items = mapper.Map<IReadOnlyCollection<CartItemViewModel>>(cartResult.Value)
         };
@@ -49,10 +49,20 @@ namespace VitrineSemiJoias.Controllers;
 
         if (result.IsSuccess)
         {
+            if (Request.Headers.XRequestedWith == "XMLHttpRequest")
+            {
+                return Json(new { success = true, message = "Produto adicionado ao pedido" });
+            }
+
             TempData["SuccessMessage"] = "Produto adicionado ao carrinho.";
         }
         else
         {
+            if (Request.Headers.XRequestedWith == "XMLHttpRequest")
+            {
+                return BadRequest(new { success = false, message = result.Error ?? "Não foi possível adicionar o produto ao pedido." });
+            }
+
             TempData["ErrorMessage"] = result.Error;
         }
 

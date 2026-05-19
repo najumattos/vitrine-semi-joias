@@ -84,7 +84,7 @@ public class CartService(IProductService productService, IHttpContextAccessor ht
         var whatsappNumber = "5514981544857";
 
         var messageBuilder = new StringBuilder();
-        messageBuilder.AppendLine("Olá Camila, aqui está o resumo do pedido montado através do catalogo virtual");
+        messageBuilder.AppendLine("Olá Camila, aqui está o resumo do pedido montado através do mostruario virtual");
         messageBuilder.AppendLine("-----------------------");
         messageBuilder.AppendLine($"SubTotal: R$ {subtotal:F2}");
         messageBuilder.AppendLine($"Horario: {currentDateTime}");

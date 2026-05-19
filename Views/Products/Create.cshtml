@@ -4,81 +4,103 @@
     Layout = "_AdminLayout";
     ViewData["Title"] = "Gerenciamento de Produtos | Novo Produto";
 }
-<div class="container-fluid px-4">
-    <h2 class="mt-4">Cadastrar Nova Joia</h2>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a asp-action="Index">Produtos</a></li>
-        <li class="breadcrumb-item active">Novo Produto</li>
-    </ol>
 
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header">
-            <i class="fas fa-plus me-1"></i> Preencha os detalhes do produto
+<div class="container-fluid py-4">
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2">
+                <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Produtos</a></li>
+                <li class="breadcrumb-item active text-dark fw-semibold">Novo Produto</li>
+            </ol>
+        </nav>
+        <h1 class="h3 fw-bold text-dark mb-1">Cadastrar Nova Joia</h1>
+        <p class="text-muted small mb-0">Insira as informações básicas, preço e imagem para disponibilizar a peça no mostruário.</p>
+    </div>
+
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-light border-bottom py-3">
+            <div class="d-flex align-items-center gap-2 text-secondary fw-semibold">
+                <i class="bi bi-plus-circle fs-5"></i>
+                <span>Preencha os detalhes do produto</span>
+            </div>
         </div>
-        <div class="card-body">
-            <form asp-action="Create" enctype="multipart/form-data">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger p-3 small mb-4"></div>
 
-                <div class="row">
-                    <div class="col-md-6">
+                <div class="row g-4">
+                    <div class="col-lg-7">
                         <div class="mb-3">
-                            <label asp-for="JewelryCode" class="form-label">Código da Joia</label>
-                            <input asp-for="JewelryCode" class="form-control"/>
-                            <span asp-validation-for="JewelryCode" class="text-danger"></span>
+                            <label asp-for="JewelryCode" class="form-label fw-semibold text-secondary small">Código da Joia (SKU)</label>
+                            <input asp-for="JewelryCode" class="form-control rounded-2 font-monospace" placeholder="Ex: AN-001, CO-102" />
+                            <span asp-validation-for="JewelryCode" class="text-danger small d-block mt-1"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Title" class="form-label">Título</label>
-                            <input asp-for="Title" class="form-control" placeholder="Ex: Colar de Pérolas" />
-                            <span asp-validation-for="Title" class="text-danger"></span>
+                            <label asp-for="Title" class="form-label fw-semibold text-secondary small">Título da Peça</label>
+                            <input asp-for="Title" class="form-control rounded-2" placeholder="Ex: Colar de Pérolas Cravejado" />
+                            <span asp-validation-for="Title" class="text-danger small d-block mt-1"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Description" class="form-label">Descrição</label>
-                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <label asp-for="Description" class="form-label fw-semibold text-secondary small">Descrição Detalhada</label>
+                            <textarea asp-for="Description" class="form-control rounded-2" rows="5" placeholder="Descreva os materiais, banho, tamanho e diferenciais da peça..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger small d-block mt-1"></span>
                         </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-lg-5">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label asp-for="Price" class="form-label">Preço</label>
+                                <label asp-for="Price" class="form-label fw-semibold text-secondary small">Preço de Venda</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">R$</span>
-                                    <input asp-for="Price" class="form-control" />
+                                    <span class="input-group-text bg-light text-muted border-end-0">R$</span>
+                                    <input asp-for="Price" class="form-control rounded-end-2 border-start-0" placeholder="0,00" />
                                 </div>
-                                <span asp-validation-for="Price" class="text-danger"></span>
-                            </div>                          
+                                <span asp-validation-for="Price" class="text-danger small d-block mt-1"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="CategoryEnum" class="form-label fw-semibold text-secondary small">Categoria</label>
+                                <select asp-for="CategoryEnum" class="form-select rounded-2" asp-items="Html.GetEnumSelectList<VitrineSemiJoias.Enums.CategoryEnum>()">
+                                    <option value="">-- Selecione --</option>
+                                </select>
+                                <span asp-validation-for="CategoryEnum" class="text-danger small d-block mt-1"></span>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label asp-for="CategoryEnum" class="form-label">Categoria</label>
-                            <select asp-for="CategoryEnum" class="form-select"
-                                    asp-items="Html.GetEnumSelectList<VitrineSemiJoias.Enums.CategoryEnum>()">
-                                <option value="">-- Selecione --</option>
-                            </select>
-                            <span asp-validation-for="CategoryEnum" class="text-danger"></span>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-secondary small">Foto do Produto</label>
+                            <input type="file" id="arquivoFoto" name="arquivoFoto" class="form-control rounded-2 mb-1" accept="image/*" />
+                            <div class="form-text text-muted">Formatos aceitos: JPG, PNG, GIF, WebP (máx. 5MB) - opcional.</div>
+
+                            <div id="containerPreview" class="mt-3" style="display: none;">
+                                <span class="d-block text-muted text-uppercase fw-bold mb-1" style="font-size: 10px;">Pré-visualização</span>
+                                <div id="fotoPreview" class="rounded border p-1 bg-white" style="width: 120px; height: 120px;"></div>
+                            </div>
+                            
+                            <div id="fotoError" class="alert alert-danger p-2 small mt-2" style="display:none;"></div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Foto do Produto</label>
-                            <input type="file" id="arquivoFoto" name="arquivoFoto" class="form-control" accept="image/*" />
-                            <div class="form-text">Formatos aceitos: JPG, PNG, GIF, WebP (máx. 5MB) - opcional.</div>
-                            <div id="fotoPreview" class="mt-3"></div>
-                            <div id="fotoError" class="alert alert-danger mt-2" style="display:none;"></div>
+                        <div class="card bg-light border-0 p-3 mb-4 rounded-3">
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" asp-for="IsAvailable" checked>
+                                <label class="form-check-label fw-semibold text-dark ms-2" asp-for="IsAvailable">Disponível para venda</label>
+                            </div>
+                            <div class="form-text text-muted ms-5 mt-0">Se ativado, o produto aparecerá imediatamente para os clientes após salvar.</div>
                         </div>
-
-                        <div class="mb-3 form-check form-switch">
-                            <input class="form-check-input" type="checkbox" asp-for="IsAvailable" checked>
-                            <label class="form-check-label" asp-for="IsAvailable">Disponível para venda</label>
-                        </div>                    
                     </div>
                 </div>
 
-                <div class="mt-4">
-                    <button type="submit" class="btn btn-primary px-4">Salvar Produto</button>
-                    <a asp-action="Index" class="btn btn-outline-secondary px-4">Cancelar</a>
+                <hr class="text-muted my-4" />
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-2 px-3">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-dark rounded-2 px-4 py-2 shadow-sm fw-semibold">
+                        <i class="bi bi-check-circle me-1"></i> Salvar Produto
+                    </button>
                 </div>
             </form>
         </div>
@@ -93,81 +115,61 @@
         document.addEventListener('DOMContentLoaded', function () {
             const fileInput = document.getElementById('arquivoFoto');
             const previewDiv = document.getElementById('fotoPreview');
+            const containerPreview = document.getElementById('containerPreview');
             const errorDiv = document.getElementById('fotoError');
             const form = document.querySelector('form');
 
-            const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+            const MAX_FILE_SIZE = 5 * 1024 * 1024;
             const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
-            if (fileInput) {
-                fileInput.addEventListener('change', function (e) {
-                    previewDiv.innerHTML = '';
-                    errorDiv.style.display = 'none';
-                    errorDiv.textContent = '';
+            if (!fileInput || !previewDiv || !containerPreview || !errorDiv || !form) return;
 
-                    if (!this.files || this.files.length === 0) {
-                        return;
-                    }
+            fileInput.addEventListener('change', function () {
+                previewDiv.innerHTML = '';
+                errorDiv.style.display = 'none';
+                containerPreview.style.display = 'none';
 
-                    const file = this.files[0];
+                if (!fileInput.files || fileInput.files.length === 0) return;
 
-                    // Validar tamanho
-                    if (file.size > MAX_FILE_SIZE) {
-                        errorDiv.textContent = `Erro: Arquivo muito grande. Tamanho máximo: 5MB. Arquivo selecionado: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
-                        errorDiv.style.display = 'block';
-                        fileInput.value = '';
-                        return;
-                    }
+                const file = fileInput.files[0];
 
-                    // Validar tipo
-                    if (!ALLOWED_TYPES.includes(file.type)) {
-                        errorDiv.textContent = `Erro: Tipo de arquivo não permitido. Formatos aceitos: ${ALLOWED_EXTENSIONS.join(', ')}`;
-                        errorDiv.style.display = 'block';
-                        fileInput.value = '';
-                        return;
-                    }
+                if (file.size > MAX_FILE_SIZE) {
+                    errorDiv.textContent = `Erro: Arquivo muito grande. Tamanho máximo: 5MB. Arquivo selecionado: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+                    errorDiv.style.display = 'block';
+                    fileInput.value = '';
+                    return;
+                }
 
-                    // Mostrar preview
-                    const reader = new FileReader();
-                    reader.onload = function (event) {
-                        const img = document.createElement('img');
-                        img.src = event.target.result;
-                        img.alt = 'Preview da foto';
-                        img.style.maxWidth = '200px';
-                        img.style.maxHeight = '200px';
-                        img.style.borderRadius = '4px';
-                        img.style.border = '1px solid #ddd';
-                        img.style.padding = '4px';
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    errorDiv.textContent = 'Erro: Tipo de arquivo não permitido. Use JPG, PNG, GIF ou WebP.';
+                    errorDiv.style.display = 'block';
+                    fileInput.value = '';
+                    return;
+                }
 
-                        previewDiv.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                });
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.className = 'w-100 h-100 rounded';
+                    img.style.objectFit = 'cover';
 
-                // Validar antes de enviar
-                form.addEventListener('submit', function (e) {
-                    if (fileInput.files.length === 0) {
-                        return; // Sem arquivo, é opcional
-                    }
+                    previewDiv.appendChild(img);
+                    containerPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            });
 
-                    const file = fileInput.files[0];
-                    if (file.size > MAX_FILE_SIZE) {
-                        e.preventDefault();
-                        errorDiv.textContent = `Erro: Arquivo muito grande. Tamanho máximo: 5MB.`;
-                        errorDiv.style.display = 'block';
-                        return;
-                    }
+            form.addEventListener('submit', function (e) {
+                if (fileInput.files.length === 0) return;
 
-                    if (!ALLOWED_TYPES.includes(file.type)) {
-                        e.preventDefault();
-                        errorDiv.textContent = `Erro: Tipo de arquivo não permitido.`;
-                        errorDiv.style.display = 'block';
-                        return;
-                    }
-                });
-            }
+                const file = fileInput.files[0];
+                if (file.size > MAX_FILE_SIZE || !ALLOWED_TYPES.includes(file.type)) {
+                    e.preventDefault();
+                    errorDiv.textContent = 'Erro: Corrija os problemas com o arquivo de imagem antes de salvar.';
+                    errorDiv.style.display = 'block';
+                }
+            });
         });
     </script>
 }
-

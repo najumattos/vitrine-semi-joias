@@ -77,6 +77,7 @@
                                     <button class="btn btn-sm" style="background: #e64e96; color: white; border: none;" data-bs-toggle="modal" data-bs-target="#productModal" 
                                             data-id="@product.Id"
                                             data-title="@product.Title"
+                                            data-jewelrycode="@product.JewelryCode"
                                             data-category="@product.CategoryEnum"
                                             data-price="@product.Price.ToString("F2")"
                                             data-description="@product.Description"
@@ -137,7 +138,7 @@
 
                         <!-- Título -->
                         <h2 id="modalProductTitle" class="fw-bold mb-2"></h2>
-                        <h2 id="modalJewelryCode" class="fw-bold mb-2"></h2>
+                        <p class="text-light mb-4">Código da peça: <strong id="modalJewelryCode"></strong></p>
 
                         <!-- Categoria -->
                         <div class="d-flex align-items-center gap-2 mb-4">
@@ -155,9 +156,13 @@
                         </div>                       
 
                         <!-- Botão de Ação -->
-                        <button type="button" class="btn w-100" style="background: #e64e96; color: white; border: none; padding: 0.75rem; font-weight: 600; border-radius: 4px;">
-                            <i class="bi bi-cart"></i> Adicionar ao Carrinho
-                        </button>
+                        <form asp-controller="Home" asp-action="AddToCart" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" id="modalProductIdInput" name="productId" value="" />
+                            <button type="submit" class="btn w-100" style="background: #e64e96; color: white; border: none; padding: 0.75rem; font-weight: 600; border-radius: 4px;">
+                                <i class="bi bi-cart"></i> Adicionar ao Carrinho
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -176,7 +181,7 @@
                 // Pega os atributos data-* do botão
                 const id = button.getAttribute('data-id');
                 const title = button.getAttribute('data-title');
-                const jewelryCode = button.getAttribute('data-jewelryCode');
+                const jewelryCode = button.getAttribute('data-jewelrycode');
                 const category = button.getAttribute('data-category');
                 const price = button.getAttribute('data-price');
                 const description = button.getAttribute('data-description');
@@ -190,6 +195,7 @@
                 document.getElementById('modalProductPrice').textContent = 'R$ ' + price;
                 document.getElementById('modalProductImage').src = image || '/images/placeholder.png';
                 document.getElementById('modalProductImage').alt = title;
+                document.getElementById('modalProductIdInput').value = id;
             });
         }
     });

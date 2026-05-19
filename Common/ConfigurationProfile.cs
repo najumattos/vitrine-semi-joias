@@ -11,6 +11,7 @@ public class ConfigurationProfile : Profile
     {
         CreateMap<ProductModel, ProductDto>().ReverseMap();
         CreateMap<ProductDto, ProductViewModel>().ReverseMap();
+        CreateMap<CartItemDto, CartItemViewModel>().ReverseMap();
 
         CreateMap<UserModel, LoginDto>().ReverseMap();
         CreateMap<LoginDto, LoginViewModel>().ReverseMap();

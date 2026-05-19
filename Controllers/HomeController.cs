@@ -1,5 +1,4 @@
 using AutoMapper;
-using Azure;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using VitrineSemiJoias.Models;
@@ -8,7 +7,7 @@ using VitrineSemiJoias.ViewModels;
 
 namespace VitrineSemiJoias.Controllers;
 
-    public class HomeController(IProductService service, IMapper mapper, ILogger<HomeController> logger) : Controller
+    public class HomeController(IProductService service, ICartService cartService, IMapper mapper, ILogger<HomeController> logger) : Controller
     {   
         public async Task<IActionResult> Index()
         {
@@ -24,7 +23,41 @@ namespace VitrineSemiJoias.Controllers;
         }
 
     [HttpGet]
-    public IActionResult Orders() => View();
+    public async Task<IActionResult> Orders()
+    {
+        var cartResult = await cartService.GetItemsAsync();
+
+        if (!cartResult.IsSuccess)
+        {
+            TempData["ErrorMessage"] = cartResult.Error;
+            return View(new OrdersViewModel());
+        }
+
+        var viewModel = new OrdersViewModel
+        {
+            Items = mapper.Map<IReadOnlyCollection<CartItemViewModel>>(cartResult.Value)
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AddToCart(int productId)
+    {
+        var result = await cartService.AddItemAsync(productId);
+
+        if (result.IsSuccess)
+        {
+            TempData["SuccessMessage"] = "Produto adicionado ao carrinho.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = result.Error;
+        }
+
+        return RedirectToAction(nameof(Orders));
+    }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

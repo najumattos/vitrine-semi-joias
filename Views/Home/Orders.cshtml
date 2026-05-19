@@ -1,5 +1,87 @@
-﻿@{
+﻿@model VitrineSemiJoias.ViewModels.OrdersViewModel
+
+@{
     ViewData["Title"] = "Meu Pedido";
 }
 
-<p>Selecione as joias e monte seu pedido para ser atendido pelo wahtsapp</p>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">Meu Pedido</h1>
+            <p class="text-muted mb-0">Revise os itens escolhidos antes de seguir para o atendimento.</p>
+        </div>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Continuar comprando</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] is string successMessage)
+    {
+        <div class="alert alert-success">@successMessage</div>
+    }
+
+    @if (TempData["ErrorMessage"] is string errorMessage)
+    {
+        <div class="alert alert-warning">@errorMessage</div>
+    }
+
+    @if (Model?.Items?.Any() == true)
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        @foreach (var item in Model.Items)
+                        {
+                            <div class="d-flex align-items-center gap-3 p-3 border-bottom">
+                                <div class="flex-shrink-0" style="width: 96px; height: 96px; background: #f6f6f7; overflow: hidden; border-radius: 0.5rem;">
+                                    @if (!string.IsNullOrWhiteSpace(item.ImageUrl))
+                                    {
+                                        <img src="~/@item.ImageUrl" alt="@item.Title" class="w-100 h-100" style="object-fit: cover;" />
+                                    }
+                                    else
+                                    {
+                                        <div class="d-flex h-100 align-items-center justify-content-center text-muted">
+                                            <i class="bi bi-image"></i>
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between gap-3">
+                                        <div>
+                                            <h5 class="mb-1">@item.Title</h5>
+                                            <div class="text-muted small">Código: @item.JewelryCode</div>
+                                        </div>
+                                        <strong class="text-nowrap">R$ @item.Price.ToString("F2")</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h4 class="fw-bold mb-3">Resumo</h4>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Itens</span>
+                            <strong>@Model.TotalItems</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span>Total</span>
+                            <strong>R$ @Model.TotalAmount.ToString("F2")</strong>
+                        </div>
+                        <button type="button" class="btn btn-primary w-100" disabled>
+                            Finalização no WhatsApp em breve
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">Seu carrinho está vazio. Volte ao catálogo para escolher suas peças.</div>
+    }
+</div>

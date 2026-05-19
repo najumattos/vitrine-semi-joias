@@ -29,5 +29,18 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
 
         adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, "123456");
         builder.Entity<UserModel>().HasData(adminUser);
+
+        builder.Entity<ProductModel>().HasData(
+            new ProductModel
+            {
+                Id = 1,
+                JewelryCode = 1001,
+                Title = "Anel Solitário de Prata Zircônia",
+                Description = "Anel solitário clássico confeccionado em prata 925 com pedra de zircônia central.",
+                Price = 129.90m,
+                ImageUrl = "img/seedAnel",
+                CategoryEnum = Enums.CategoryEnum.Anel, 
+                IsAvailable = true
+            });
     }
 }

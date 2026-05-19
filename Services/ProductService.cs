@@ -99,11 +99,10 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
             return Result<bool>.Failure("Produto não encontrado no banco de dados.");
         }
         var produtoOriginal = produtoBancoResult.Value;
-
+        produtoOriginal.JewelryCode = product.JewelryCode;
         produtoOriginal.Title = product.Title;
         produtoOriginal.Description = product.Description;
-        produtoOriginal.Price = product.Price;
-        produtoOriginal.StockQuantity = product.StockQuantity;
+        produtoOriginal.Price = product.Price;       
         produtoOriginal.CategoryEnum = product.CategoryEnum;
         produtoOriginal.IsAvailable = product.IsAvailable;
 

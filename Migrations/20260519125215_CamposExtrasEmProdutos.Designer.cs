@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VitrineSemiJoias.Data;
 
@@ -11,9 +12,11 @@ using VitrineSemiJoias.Data;
 namespace VitrineSemiJoias.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519125215_CamposExtrasEmProdutos")]
+    partial class CamposExtrasEmProdutos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,11 +185,21 @@ namespace VitrineSemiJoias.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
+                    b.Property<bool>("IsLastUnits")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<int>("JewelryCode")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("StockQuantity")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -195,23 +208,7 @@ namespace VitrineSemiJoias.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("JewelryCode")
-                        .IsUnique();
-
                     b.ToTable("Products", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CategoryEnum = "Anel",
-                            Description = "Anel solitário clássico confeccionado em prata 925 com pedra de zircônia central.",
-                            ImageUrl = "wwwroot/img/seedAnel",
-                            IsAvailable = true,
-                            JewelryCode = 1001,
-                            Price = 129.90m,
-                            Title = "Anel Solitário de Prata Zircônia"
-                        });
                 });
 
             modelBuilder.Entity("VitrineSemiJoias.Models.UserModel", b =>
@@ -298,17 +295,17 @@ namespace VitrineSemiJoias.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "68958a0f-209a-426a-9179-e7dc55438e86",
+                            ConcurrencyStamp = "30f704d0-e010-4ea9-95af-48c3ef2c5255",
                             Email = "camila@admin.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             Name = "Camila Reis",
                             NormalizedEmail = "CAMILA@ADMIN.COM",
                             NormalizedUserName = "CAMILA@ADMIN.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJUcXLoVZioGgNc+8MmqqZHJt0DMsGGuXxZowl9oOkAATvRQ5Ro3QK4BU7C9Pbi/Hw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELTh0HoboZ4Ba0YNL318Yeohi94Ww/vO+R1woZgEYJ7PW1c3QbBZDN9Sih5oug5Bfg==",
                             PhoneNumberConfirmed = false,
                             Profile = "0",
-                            SecurityStamp = "03068a27-3622-49bc-94c0-7fb6f2cb6922",
+                            SecurityStamp = "84a194f7-ae82-42b5-aa37-8fbf1785371a",
                             TwoFactorEnabled = false,
                             UserName = "camila@admin.com"
                         });

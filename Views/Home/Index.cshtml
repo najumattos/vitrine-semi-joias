@@ -28,7 +28,7 @@
         <div class="row g-4">
             @foreach (var product in Model)
             {
-                @if (product.IsAvailable && product.StockQuantity > 0)
+                @if (product.IsAvailable)
                 {
                     <div class="col-12 col-md-6 col-lg-4">
                         <div class="card h-100 border-1 shadow-sm" style="border-color: #e6a1c2 !important;">
@@ -80,8 +80,7 @@
                                             data-category="@product.CategoryEnum"
                                             data-price="@product.Price.ToString("F2")"
                                             data-description="@product.Description"
-                                            data-image="@product.ImageUrl"
-                                            data-stock="@product.StockQuantity">
+                                            data-image="@product.ImageUrl">
                                         <i class="bi bi-eye"></i> Ver
                                     </button>
                                 </div>
@@ -138,10 +137,12 @@
 
                         <!-- Título -->
                         <h2 id="modalProductTitle" class="fw-bold mb-2"></h2>
+                        <h2 id="modalJewelryCode" class="fw-bold mb-2"></h2>
 
                         <!-- Categoria -->
                         <div class="d-flex align-items-center gap-2 mb-4">
                             <span class="badge rounded-pill px-3 py-2" style="background: #fce4ec; color: #e64e96; font-weight: 600;" id="modalProductCategory"></span>
+                            <span class="badge rounded-pill px-3 py-2" style="background: #fce4ec; color: #e64e96; font-weight: 600;" id="modalIsLastUnits"></span>
                         </div>
 
                         <!-- Descrição -->
@@ -151,13 +152,7 @@
                         <div class="mb-4">
                             <p class="text-muted small mb-1">Preço</p>
                             <h3 id="modalProductPrice" class="fw-bold" style="color: #e64e96; font-size: 2rem;">R$ 0,00</h3>
-                        </div>
-
-                        <!-- Estoque -->
-                        <div class="mb-4">
-                            <p class="text-muted small mb-1">Disponibilidade em Estoque</p>
-                            <p id="modalProductStock" class="mb-0"><strong id="stockQty">0</strong> unidades</p>
-                        </div>
+                        </div>                       
 
                         <!-- Botão de Ação -->
                         <button type="button" class="btn w-100" style="background: #e64e96; color: white; border: none; padding: 0.75rem; font-weight: 600; border-radius: 4px;">
@@ -181,20 +176,20 @@
                 // Pega os atributos data-* do botão
                 const id = button.getAttribute('data-id');
                 const title = button.getAttribute('data-title');
+                const jewelryCode = button.getAttribute('data-jewelryCode');
                 const category = button.getAttribute('data-category');
                 const price = button.getAttribute('data-price');
                 const description = button.getAttribute('data-description');
                 const image = button.getAttribute('data-image');
-                const stock = button.getAttribute('data-stock');
                 
                 // Preenche o modal com os dados
                 document.getElementById('modalProductTitle').textContent = title;
+                document.getElementById('modalJewelryCode').textContent = jewelryCode;
                 document.getElementById('modalProductCategory').textContent = category;
-                document.getElementById('modalProductDescription').textContent = description || 'Sem descrição disponível';
+                document.getElementById('modalProductDescription').textContent = description || '';
                 document.getElementById('modalProductPrice').textContent = 'R$ ' + price;
                 document.getElementById('modalProductImage').src = image || '/images/placeholder.png';
                 document.getElementById('modalProductImage').alt = title;
-                document.getElementById('stockQty').textContent = stock;
             });
         }
     });

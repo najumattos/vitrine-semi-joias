@@ -14,18 +14,17 @@ namespace VitrineSemiJoias.Controllers;
         {
             var result = await service.GetAllProductsAsync();
         if (!result.IsSuccess)
-        {
-            // Se falhar, registra o erro e envia uma lista vazia para a View
+        {            
             logger.LogWarning("Falha ao carregar produtos.");
             return View(Enumerable.Empty<ProductViewModel>());
         }
-        // Mapeamos a LISTA de DTOs para uma LISTA de ViewModels
         var productsVM = mapper.Map<IEnumerable<ProductViewModel>>(result.Value);
 
         return View(productsVM);    
         }
 
- 
+    [HttpGet]
+    public IActionResult Orders() => View();
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

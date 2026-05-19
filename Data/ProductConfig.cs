@@ -11,6 +11,12 @@ public class ProductConfig : IEntityTypeConfiguration<ProductModel>
         builder.ToTable("Products");
         builder.HasKey(p => p.Id);
 
+        builder.Property(p => p.JewelryCode)
+                .IsRequired();
+
+        builder.HasIndex(p => p.JewelryCode)
+               .IsUnique();
+
         builder.Property(p => p.Title)
                .IsRequired()
                .HasMaxLength(100);
@@ -27,16 +33,12 @@ public class ProductConfig : IEntityTypeConfiguration<ProductModel>
                .IsRequired()
                .HasMaxLength(255);
 
-        builder.Property(p => p.StockQuantity)
-               .HasDefaultValue(1);
-        
         builder.Property(p => p.CategoryEnum)
                .IsRequired()
                .HasConversion<string>()
                .HasMaxLength(50);
 
         builder.Property(p => p.IsAvailable)            
-               .HasConversion<bool>()
                .HasDefaultValue(true);
     }
 }

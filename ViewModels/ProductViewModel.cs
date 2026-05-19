@@ -7,7 +7,10 @@ public class ProductViewModel
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "O título do produto é obrigatório.")]
+    [Required(ErrorMessage = "O código da peça é obrigatório.")]
+    public int JewelryCode { get; set; }
+
+    [Required(ErrorMessage = "O título da peça é obrigatório.")]
     [StringLength(100, MinimumLength = 3, ErrorMessage = "O título deve ter entre 3 e 100 caracteres.")]
     public string Title { get; set; } = string.Empty;
 
@@ -19,11 +22,7 @@ public class ProductViewModel
     public decimal Price { get; set; }
 
     [Display(Name = "URL da Imagem")]
-    public string ImageUrl { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "A quantidade em estoque é obrigatória.")]
-    [Range(0, int.MaxValue, ErrorMessage = "O estoque não pode ser negativo.")]
-    public int StockQuantity { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;   
 
     [Required(ErrorMessage = "A categoria é obrigatória.")]
     public CategoryEnum CategoryEnum { get; set; }

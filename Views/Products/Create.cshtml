@@ -22,6 +22,12 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
+                            <label asp-for="JewelryCode" class="form-label">Código da Joia</label>
+                            <input asp-for="JewelryCode" class="form-control"/>
+                            <span asp-validation-for="JewelryCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
                             <label asp-for="Title" class="form-label">Título</label>
                             <input asp-for="Title" class="form-control" placeholder="Ex: Colar de Pérolas" />
                             <span asp-validation-for="Title" class="text-danger"></span>
@@ -43,12 +49,7 @@
                                     <input asp-for="Price" class="form-control" />
                                 </div>
                                 <span asp-validation-for="Price" class="text-danger"></span>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="StockQuantity" class="form-label">Estoque</label>
-                                <input asp-for="StockQuantity" class="form-control" type="number" />
-                                <span asp-validation-for="StockQuantity" class="text-danger"></span>
-                            </div>
+                            </div>                          
                         </div>
 
                         <div class="mb-3">
@@ -58,7 +59,7 @@
                                 <option value="">-- Selecione --</option>
                             </select>
                             <span asp-validation-for="CategoryEnum" class="text-danger"></span>
-                        </div>                    
+                        </div>
 
                         <div class="mb-3">
                             <label class="form-label">Foto do Produto</label>
@@ -71,7 +72,7 @@
                         <div class="mb-3 form-check form-switch">
                             <input class="form-check-input" type="checkbox" asp-for="IsAvailable" checked>
                             <label class="form-check-label" asp-for="IsAvailable">Disponível para venda</label>
-                        </div>
+                        </div>                    
                     </div>
                 </div>
 

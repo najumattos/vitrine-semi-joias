@@ -12,15 +12,18 @@
     <thead>
         <tr>
             <th>
+                Foto
+            </th>
+            <th>
+                Código da Joia
+            </th>
+            <th>
                 Titulo
             </th>
          
             <th>
                 Preço
-            </th>          
-            <th>
-                Quantidade
-            </th>
+            </th>                    
             <th>
                Categoria
             </th>
@@ -33,15 +36,18 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
+                <td>
+                    # @item.ImageUrl
+                </td>
+                <td>
+                    # @item.JewelryCode
+                </td>
             <td>
                 @item.Title
             </td>         
             <td>
                     @item.Price.ToString("C2")
-            </td>         
-            <td>
-                @item.StockQuantity
-            </td>
+            </td>                   
             <td>
                     @item.CategoryEnum.ToString()
             </td>
@@ -54,7 +60,7 @@
                     {
                         <span class="badge bg-secondary">Inativo</span>
                     }
-                </td>
+                </td>              
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |

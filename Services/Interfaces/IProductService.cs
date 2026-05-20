@@ -11,6 +11,7 @@ public interface IProductService
     Task<Result<ProductDto>> GetProductByIdAsync(int id);
     Task<Result<IEnumerable<ProductDto>>> GetProductByCategoryAsync(CategoryEnum category);
     Task <Result<ProductDto>> AddProductAsync(ProductDto product, IFormFile arquivoFoto);
+    Task<Result<string>> GenerateDescriptionFromImageAsync(IFormFile arquivoFoto, CancellationToken cancellationToken = default);
     Task<Result<bool>> UpdateProductAsync(ProductDto product, IFormFile arquivoFoto);        
     Task<Result> DeleteProductAsync(ProductDto product);
 }

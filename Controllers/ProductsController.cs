@@ -53,6 +53,27 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
     public IActionResult Create() => View();
 
     [HttpPost]
+    public async Task<IActionResult> GenerateDescription(IFormFile arquivoFoto, CancellationToken cancellationToken)
+    {
+        var result = await service.GenerateDescriptionFromImageAsync(arquivoFoto, cancellationToken);
+
+        if (!result.IsSuccess)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = result.Error ?? "Não foi possível gerar a descrição da joia."
+            });
+        }
+
+        return Json(new
+        {
+            success = true,
+            description = result.Value
+        });
+    }
+
+    [HttpPost]
     public async Task<IActionResult> Create(ProductViewModel product, IFormFile arquivoFoto)
     {
         if (!ModelState.IsValid) return View(product);
@@ -97,7 +118,7 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
-        // Busca o produto para exibir os detalhes na tela de confirma��o
+        // Busca o produto para exibir os detalhes na tela de confirma��o
         var product = await service.GetProductByIdAsync(id);
 
         if (product == null){

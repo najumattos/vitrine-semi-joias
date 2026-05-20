@@ -8,7 +8,7 @@ using VitrineSemiJoias.Services.Interfaces;
 
 namespace VitrineSemiJoias.Services;
 
-public class ProductService(IProductRepository repository, IMapper mapper, IFileService fileService) : IProductService
+public class ProductService(IProductRepository repository, IMapper mapper, IFileService fileService, IGeminiService geminiService) : IProductService
 {
     public async Task<Result<ProductDto>> AddProductAsync(ProductDto product, IFormFile arquivoFoto)
     {
@@ -85,6 +85,22 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
             return Result<ProductDto>.Failure(response.Error);
         }
         return Result<ProductDto>.Success(mapper.Map<ProductDto>(response.Value));
+    }
+
+    public async Task<Result<string>> GenerateDescriptionFromImageAsync(IFormFile arquivoFoto, CancellationToken cancellationToken = default)
+    {
+        if (arquivoFoto == null || arquivoFoto.Length == 0)
+        {
+            return Result<string>.Failure("Envie uma imagem válida para gerar a descrição.");
+        }
+
+        if (string.IsNullOrWhiteSpace(arquivoFoto.ContentType) || !arquivoFoto.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        {
+            return Result<string>.Failure("O arquivo enviado não é uma imagem válida.");
+        }
+
+        await using var stream = arquivoFoto.OpenReadStream();
+        return await geminiService.GenerateJewelryDescriptionAsync(stream, arquivoFoto.ContentType, cancellationToken);
     }
 
     public async Task<Result<bool>> UpdateProductAsync(ProductDto product, IFormFile arquivoFoto)

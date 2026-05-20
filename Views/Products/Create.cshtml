@@ -43,8 +43,16 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Description" class="form-label fw-semibold text-secondary small">Descrição Detalhada</label>
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                                <label asp-for="Description" class="form-label fw-semibold text-secondary small mb-0">Descrição Detalhada</label>
+                                <button type="button" id="btnGerarDescricaoIA" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2">
+                                    <i class="bi bi-stars"></i>
+                                    <span>Gerar Descrição com IA</span>
+                                    <span id="spinnerGerarDescricaoIA" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;"></span>
+                                </button>
+                            </div>
                             <textarea asp-for="Description" class="form-control rounded-2" rows="5" placeholder="Descreva os materiais, banho, tamanho e diferenciais da peça..."></textarea>
+                            <div id="descricaoIaFeedback" class="small mt-2" style="display:none;"></div>
                             <span asp-validation-for="Description" class="text-danger small d-block mt-1"></span>
                         </div>
                     </div>
@@ -118,11 +126,21 @@
             const containerPreview = document.getElementById('containerPreview');
             const errorDiv = document.getElementById('fotoError');
             const form = document.querySelector('form');
+            const btnGerarDescricaoIA = document.getElementById('btnGerarDescricaoIA');
+            const spinnerGerarDescricaoIA = document.getElementById('spinnerGerarDescricaoIA');
+            const descricaoTextarea = document.getElementById('Description');
+            const descricaoIaFeedback = document.getElementById('descricaoIaFeedback');
 
             const MAX_FILE_SIZE = 5 * 1024 * 1024;
             const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-            if (!fileInput || !previewDiv || !containerPreview || !errorDiv || !form) return;
+            if (!fileInput || !previewDiv || !containerPreview || !errorDiv || !form || !btnGerarDescricaoIA || !spinnerGerarDescricaoIA || !descricaoTextarea || !descricaoIaFeedback) return;
+
+            function exibirFeedbackDescricao(mensagem, sucesso) {
+                descricaoIaFeedback.textContent = mensagem;
+                descricaoIaFeedback.className = sucesso ? 'small mt-2 text-success' : 'small mt-2 text-danger';
+                descricaoIaFeedback.style.display = 'block';
+            }
 
             fileInput.addEventListener('change', function () {
                 previewDiv.innerHTML = '';
@@ -168,6 +186,54 @@
                     e.preventDefault();
                     errorDiv.textContent = 'Erro: Corrija os problemas com o arquivo de imagem antes de salvar.';
                     errorDiv.style.display = 'block';
+                }
+            });
+
+            btnGerarDescricaoIA.addEventListener('click', async function () {
+                descricaoIaFeedback.style.display = 'none';
+                errorDiv.style.display = 'none';
+
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    exibirFeedbackDescricao('Selecione uma imagem antes de gerar a descrição.', false);
+                    return;
+                }
+
+                const file = fileInput.files[0];
+                if (file.size > MAX_FILE_SIZE || !ALLOWED_TYPES.includes(file.type)) {
+                    exibirFeedbackDescricao('A imagem selecionada é inválida. Use JPG, PNG, GIF ou WebP (até 5MB).', false);
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('arquivoFoto', file);
+
+                btnGerarDescricaoIA.disabled = true;
+                spinnerGerarDescricaoIA.style.display = 'inline-block';
+
+                try {
+                    const response = await fetch('@Url.Action("GenerateDescription", "Products")', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        const message = (data && data.message) ? data.message : 'Não foi possível gerar a descrição agora.';
+                        exibirFeedbackDescricao(message, false);
+                        return;
+                    }
+
+                    descricaoTextarea.value = data.description || '';
+                    exibirFeedbackDescricao('Descrição gerada com sucesso.', true);
+                } catch (error) {
+                    exibirFeedbackDescricao('Erro de comunicação ao gerar a descrição. Tente novamente.', false);
+                } finally {
+                    btnGerarDescricaoIA.disabled = false;
+                    spinnerGerarDescricaoIA.style.display = 'none';
                 }
             });
         });

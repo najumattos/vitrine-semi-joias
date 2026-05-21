@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using VitrineSemiJoias.Models;
+using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Services.Interfaces;
 using VitrineSemiJoias.ViewModels;
 
@@ -9,15 +10,35 @@ namespace VitrineSemiJoias.Controllers;
 
     public class HomeController(IProductService service, ICartService cartService, IMapper mapper, ILogger<HomeController> logger) : Controller
     {   
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchTerm, CategoryEnum? category)
         {
             var result = await service.GetAllProductsAsync();
         if (!result.IsSuccess)
         {            
             logger.LogWarning("Falha ao carregar produtos.");
+                ViewData["SearchTerm"] = searchTerm;
+                ViewData["SelectedCategory"] = category?.ToString();
             return View(Enumerable.Empty<ProductViewModel>());
         }
-        var productsVM = mapper.Map<IEnumerable<ProductViewModel>>(result.Value);
+
+            var normalizedSearchTerm = searchTerm?.Trim();
+            var products = result.Value ?? Enumerable.Empty<VitrineSemiJoias.DTOs.ProductDto>();
+
+            if (category.HasValue && Enum.IsDefined(typeof(VitrineSemiJoias.Enums.CategoryEnum), category.Value))
+            {
+                products = products.Where(product => product.CategoryEnum == category.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(normalizedSearchTerm))
+            {
+                products = products.Where(product =>
+                    product.Title.Contains(normalizedSearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    product.JewelryCode.ToString().Contains(normalizedSearchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            ViewData["SearchTerm"] = normalizedSearchTerm;
+            ViewData["SelectedCategory"] = category?.ToString();
+            var productsVM = mapper.Map<IEnumerable<ProductViewModel>>(products);
 
         return View(productsVM);    
         }

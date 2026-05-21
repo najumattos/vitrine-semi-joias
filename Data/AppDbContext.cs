@@ -35,12 +35,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
             {
                 Id = 1,
                 JewelryCode = 1001,
-                Title = "Anel Solit·rio de Prata ZircÙnia",
-                Description = "Anel solit·rio cl·ssico confeccionado em prata 925 com pedra de zircÙnia central.",
+                Title = "SEED: Anel Solit√°rio de Prata Zirc√¥nia",
+                Description = "Anel solit√°rio cl√°ssico confeccionado em prata 925 com pedra de zirc√¥nia central.",
                 Price = 129.90m,
                 ImageUrl = "img/seedAnel",
                 CategoryEnum = Enums.CategoryEnum.Anel, 
-                IsAvailable = true
+                IsAvailable = false
             });
     }
 }

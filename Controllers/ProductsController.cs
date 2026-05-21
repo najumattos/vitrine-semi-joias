@@ -10,13 +10,27 @@ namespace VitrineSemiJoias.Controllers;
 public class ProductsController(IProductService service, IMapper mapper) : Controller
 {
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string searchTerm)
     {
         var result = await service.GetAllProductsAsync();
         if (!result.IsSuccess)
+        {
+            ViewData["SearchTerm"] = searchTerm;
             return View(Enumerable.Empty<ProductViewModel>());
+        }
 
-        return View(mapper.Map<IEnumerable<ProductViewModel>>(result.Value));
+        var normalizedSearchTerm = searchTerm?.Trim();
+        var products = result.Value ?? Enumerable.Empty<ProductDto>();
+
+        if (!string.IsNullOrWhiteSpace(normalizedSearchTerm))
+        {
+            products = products.Where(product =>
+                product.Title.Contains(normalizedSearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                product.JewelryCode.ToString().Contains(normalizedSearchTerm, StringComparison.OrdinalIgnoreCase));
+        }
+
+        ViewData["SearchTerm"] = normalizedSearchTerm;
+        return View(mapper.Map<IEnumerable<ProductViewModel>>(products));
     }
      
     [HttpGet]

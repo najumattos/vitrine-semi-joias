@@ -11,4 +11,5 @@ public class LoginViewModel
     [Required(ErrorMessage = "A senha é obrigatória.")]
     [DataType(DataType.Password)]
     public string Password { get; set; } = string.Empty;
+    public bool IsPersistent { get; set; } = false;
 }

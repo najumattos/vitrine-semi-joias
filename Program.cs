@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using VitrineSemiJoias.Configurations;
 using VitrineSemiJoias.Data;
 using VitrineSemiJoias.Models;
+using VitrineSemiJoias.Services;
+using VitrineSemiJoias.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 Env.Load();
@@ -39,8 +41,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     options.SlidingExpiration = true;
 });
-
+builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
 builder.Services.AddSmartServices();
+builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 
 var app = builder.Build();
 

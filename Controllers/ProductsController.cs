@@ -24,9 +24,9 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
 
         if (!string.IsNullOrWhiteSpace(normalizedSearchTerm))
         {
-            products = products.Where(product =>
-                product.Title.Contains(normalizedSearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                product.JewelryCode.ToString().Contains(normalizedSearchTerm, StringComparison.OrdinalIgnoreCase));
+            products = products.Where(result =>
+                result.Title.Contains(normalizedSearchTerm, StringComparison.OrdinalIgnoreCase) ||
+                result.JewelryCode.ToString().Contains(normalizedSearchTerm, StringComparison.OrdinalIgnoreCase));
         }
 
         ViewData["SearchTerm"] = normalizedSearchTerm;
@@ -67,6 +67,7 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
     public IActionResult Create() => View();
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> GenerateDescription(IFormFile arquivoFoto, CancellationToken cancellationToken)
     {
         var result = await service.GenerateDescriptionFromImageAsync(arquivoFoto, cancellationToken);
@@ -90,15 +91,13 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
     [HttpPost]
     public async Task<IActionResult> Create(ProductViewModel product, IFormFile arquivoFoto)
     {
-        if (!ModelState.IsValid) return View(product);
-        ;
+      if (!ModelState.IsValid) return View(product);
+        
         var result = await service.AddProductAsync(mapper.Map<ProductDto>(product), arquivoFoto);
+        if (result.IsSuccess) return RedirectToAction(nameof(Index)); 
 
-        if (result.IsSuccess)
-            return RedirectToAction(nameof(Index)); 
-
-        ModelState.AddModelError(string.Empty, result.Error);
-        return View(mapper.Map<ProductViewModel>(result.Value));
+        ModelState.AddModelError(string.Empty, result.Error ?? "Erro ao salvar o produto.");
+        return View(product);
     }
 
     [HttpGet]
@@ -115,42 +114,35 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
     [HttpPost]
     public async Task<IActionResult> Edit(ProductViewModel product, IFormFile arquivoFoto)
     {
-        if (!ModelState.IsValid) return View(product);
-        var productDto = mapper.Map<ProductDto>(product);
-        var result = await service.UpdateProductAsync(productDto, arquivoFoto);
-
-        if (result.IsSuccess){
-            return RedirectToAction(nameof(Index));
-        }
+       if (!ModelState.IsValid) return View(product);
         
+        var result = await service.UpdateProductAsync(mapper.Map<ProductDto>(product), arquivoFoto);
+        if (result.IsSuccess) return RedirectToAction(nameof(Index));
 
-        ModelState.AddModelError(string.Empty, result.Error);
-        var productVM = mapper.Map<ProductViewModel>(result);
+        ModelState.AddModelError(string.Empty, result.Error ?? "Erro ao atualizar o produto.");
         return View(product);
     }
 
     [HttpGet]
     public async Task<IActionResult> Delete(int id)
     {
-        // Busca o produto para exibir os detalhes na tela de confirma��o
-        var product = await service.GetProductByIdAsync(id);
+        var result = await service.GetProductByIdAsync(id);
 
-        if (product == null){
-            return NotFound();
-        }
-
-        
-        return View(mapper.Map<ProductViewModel>(product.Value));
+       if (!result.IsSuccess || result.Value == null) return NotFound();     
+        return View(mapper.Map<ProductViewModel>(result.Value));
     }
     [HttpPost]
+    [ActionName("Delete")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(ProductViewModel product)
     {
-        var result = await service.DeleteProductAsync(mapper.Map<ProductDto>(product));
+       if (product == null) return BadRequest();
+       var result = await service.DeleteProductAsync(mapper.Map<ProductDto>(product));
+        if (!result.IsSuccess)
+        {
+            TempData["Error"] = result.Error;
+        }
 
-        if (result.IsSuccess)
-            return RedirectToAction(nameof(Index));
-
-        TempData["Error"] = result.Error;
         return RedirectToAction(nameof(Index));
     }
 }

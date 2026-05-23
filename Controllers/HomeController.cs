@@ -5,10 +5,15 @@ using VitrineSemiJoias.Models;
 using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Services.Interfaces;
 using VitrineSemiJoias.ViewModels;
+using VitrineSemiJoias.DTOs;
 
 namespace VitrineSemiJoias.Controllers;
 
-    public class HomeController(IProductService service, ICartService cartService, IMapper mapper, ILogger<HomeController> logger) : Controller
+    public class HomeController(
+        IProductService service, 
+        ICartService cartService,
+        IMapper mapper, 
+        ILogger<HomeController> logger) : Controller
     {   
         public async Task<IActionResult> Index(string searchTerm, CategoryEnum? category)
         {
@@ -22,9 +27,9 @@ namespace VitrineSemiJoias.Controllers;
         }
 
             var normalizedSearchTerm = searchTerm?.Trim();
-            var products = result.Value ?? Enumerable.Empty<VitrineSemiJoias.DTOs.ProductDto>();
+            var products = result.Value ?? Enumerable.Empty<ProductDto>();
 
-            if (category.HasValue && Enum.IsDefined(typeof(VitrineSemiJoias.Enums.CategoryEnum), category.Value))
+            if (category.HasValue && Enum.IsDefined(typeof(CategoryEnum), category.Value))
             {
                 products = products.Where(product => product.CategoryEnum == category.Value);
             }
@@ -38,9 +43,7 @@ namespace VitrineSemiJoias.Controllers;
 
             ViewData["SearchTerm"] = normalizedSearchTerm;
             ViewData["SelectedCategory"] = category?.ToString();
-            var productsVM = mapper.Map<IEnumerable<ProductViewModel>>(products);
-
-        return View(productsVM);    
+            return View(mapper.Map<IEnumerable<ProductViewModel>>(products));    
         }
 
     [HttpGet]

@@ -8,83 +8,109 @@ using VitrineSemiJoias.Services.Interfaces;
 
 namespace VitrineSemiJoias.Services;
 
-public class ProductService(IProductRepository repository, IMapper mapper, IFileService fileService, IGeminiService geminiService) : IProductService
+public class ProductService(
+    IProductRepository repository,
+    IMapper mapper,
+    IFileService fileService,
+    IGeminiService geminiService,
+    ILogger<ProductService> logger) : IProductService
 {
     public async Task<Result<ProductDto>> AddProductAsync(ProductDto product, IFormFile arquivoFoto)
     {
-        if (product == null)
+        if (product == null) return Result<ProductDto>.Failure("Produto inválido ou não informado.");
+        string? caminhoFotoSalva = null;
+        try
         {
-            return Result<ProductDto>.Failure("Produto inválido ou não informado.");
+            if (arquivoFoto != null && arquivoFoto.Length > 0)
+            {
+                caminhoFotoSalva = await fileService.SaveFileAsync(arquivoFoto, "img/products");
+                product.ImageUrl = caminhoFotoSalva;
+            }
+            var response = await repository.AddProductAsync(mapper.Map<ProductModel>(product));
+            return Result<ProductDto>.Success(mapper.Map<ProductDto>(response));
         }
-        if (arquivoFoto != null)
+        catch (Exception ex)
         {
-            product.ImageUrl = await fileService.SaveFileAsync(arquivoFoto, "img/products");
-        }
-        var response = await repository.AddProductAsync(mapper.Map<ProductModel>(product));
+            logger.LogError(ex, "Erro ao tentar adicionar produto no banco de dados.");
 
-        if (!response.IsSuccess)
-        {
-            return Result<ProductDto>.Failure(response.Error);
-        }
-        return Result<ProductDto>.Success(mapper.Map<ProductDto>(response.Value));
+            if (!string.IsNullOrEmpty(caminhoFotoSalva))
+            {
+                await fileService.DeleteFileAsync(caminhoFotoSalva);
+            }
 
+            return Result<ProductDto>.Failure("Não foi possível cadastrar o produto no momento.");
+        }
     }
 
     public async Task<Result> DeleteProductAsync(ProductDto product)
     {
-        if (product == null)                     
+        if (product == null)
         {
             return Result.Failure("Produto inválido ou não informado.");
         }
-        
-        var response = await repository.DeleteProductAsync(product.Id);
-        await fileService.DeleteFileAsync(product.ImageUrl);
-        if (!response.IsSuccess)
+        try
         {
-            return Result.Failure(response.Error);
+            await repository.DeleteProductAsync(product.Id);
+            await fileService.DeleteFileAsync(product.ImageUrl);
+            return Result.Success();
         }
-        return Result.Success();
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao tentar excluir produto ID: {Id}", product.Id);
+            return Result.Failure("Não foi possível excluir o produto.");
+        }
     }
 
     public async Task<Result<IEnumerable<ProductDto>>> GetAllProductsAsync()
     {
-        var response = await repository.GetAllProductsAsync();
-        if (!response.IsSuccess)
+        try
         {
-            return Result<IEnumerable<ProductDto>>.Failure(response.Error);
+            var products = await repository.GetAllProductsAsync();
+            var dtos = mapper.Map<IEnumerable<ProductDto>>(products);
+            return Result<IEnumerable<ProductDto>>.Success(dtos);
         }
-
-        return Result<IEnumerable<ProductDto>>.Success(mapper.Map<IEnumerable<ProductDto>>(response.Value));
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao listar todos os produtos.");
+            return Result<IEnumerable<ProductDto>>.Failure("Não foi possível carregar a lista de produtos.");
+        }
     }
 
     public async Task<Result<IEnumerable<ProductDto>>> GetProductByCategoryAsync(CategoryEnum category)
     {
-        if (!Enum.IsDefined(typeof(CategoryEnum), category))
-        {
-            return Result<IEnumerable<ProductDto>>.Failure("Categoria inválida ou não informada.");
-        }
-        var response = await repository.GetProductByCategoryAsync(category);
+        if (!Enum.IsDefined(typeof(CategoryEnum), category)) return Result<IEnumerable<ProductDto>>.Failure("Categoria inválida ou não informada.");
 
-        if (!response.IsSuccess)
+        try
         {
-            return Result<IEnumerable<ProductDto>>.Failure(response.Error);
+            var products = await repository.GetProductByCategoryAsync(category);
+            var dtos = mapper.Map<IEnumerable<ProductDto>>(products);
+            return Result<IEnumerable<ProductDto>>.Success(dtos);
         }
-        return Result<IEnumerable<ProductDto>>.Success(mapper.Map<IEnumerable<ProductDto>>(response.Value));
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao buscar produtos da categoria: {Category}", category);
+            return Result<IEnumerable<ProductDto>>.Failure("Não foi possível filtrar os produtos por categoria.");
+        }
     }
 
     public async Task<Result<ProductDto>> GetProductByIdAsync(int id)
     {
-        if (id <= 0)
-        {
-            return Result<ProductDto>.Failure("Produto inválido ou não informado.");
-        }
-        var response = await repository.GetProductByIdAsync(id);
+        if (id <= 0) return Result<ProductDto>.Failure("Produto inválido ou não informado.");
 
-        if (!response.IsSuccess)
+        try
         {
-            return Result<ProductDto>.Failure(response.Error);
+            var product = await repository.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return Result<ProductDto>.Failure("Produto não encontrado.");
+            }
+            return Result<ProductDto>.Success(mapper.Map<ProductDto>(product));
         }
-        return Result<ProductDto>.Success(mapper.Map<ProductDto>(response.Value));
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Erro ao buscar produto pelo ID: {Id}", id);
+            return Result<ProductDto>.Failure("Não foi possível obter os detalhes do produto.");
+        }
     }
 
     public async Task<Result<string>> GenerateDescriptionFromImageAsync(IFormFile arquivoFoto, CancellationToken cancellationToken = default)
@@ -93,60 +119,53 @@ public class ProductService(IProductRepository repository, IMapper mapper, IFile
         {
             return Result<string>.Failure("Envie uma imagem válida para gerar a descrição.");
         }
-
         if (string.IsNullOrWhiteSpace(arquivoFoto.ContentType) || !arquivoFoto.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
         {
             return Result<string>.Failure("O arquivo enviado não é uma imagem válida.");
         }
-
         await using var stream = arquivoFoto.OpenReadStream();
         return await geminiService.GenerateJewelryDescriptionAsync(stream, arquivoFoto.ContentType, cancellationToken);
     }
 
     public async Task<Result<bool>> UpdateProductAsync(ProductDto product, IFormFile arquivoFoto)
     {
-        if (product == null)
+        if (product == null) return Result<bool>.Failure("Produto inválido ou não informado.");
+        try
         {
-            return Result<bool>.Failure("Produto inválido ou não informado.");
-        }
-        var produtoBancoResult = await repository.GetProductByIdAsync(product.Id);
-        if (!produtoBancoResult.IsSuccess || produtoBancoResult.Value == null)
-        {
-            return Result<bool>.Failure("Produto não encontrado no banco de dados.");
-        }
-        var produtoOriginal = produtoBancoResult.Value;
-        produtoOriginal.JewelryCode = product.JewelryCode;
-        produtoOriginal.Title = product.Title;
-        produtoOriginal.Description = product.Description;
-        produtoOriginal.Price = product.Price;       
-        produtoOriginal.CategoryEnum = product.CategoryEnum;
-        produtoOriginal.IsAvailable = product.IsAvailable;
+            var produtoOriginal = await repository.GetProductByIdAsync(product.Id);
+            if (produtoOriginal == null)
+            {
+                return Result<bool>.Failure("Produto não encontrado no banco de dados.");
+            }
+            produtoOriginal.JewelryCode = product.JewelryCode;
+            produtoOriginal.Title = product.Title;
+            produtoOriginal.Description = product.Description;
+            produtoOriginal.Price = product.Price;
+            produtoOriginal.CategoryEnum = product.CategoryEnum;
+            produtoOriginal.IsAvailable = product.IsAvailable;
 
-        if (arquivoFoto != null && arquivoFoto.Length > 0)
-        {
-            var novaImagem = await AtualizarFoto(produtoOriginal.ImageUrl, arquivoFoto);
-            produtoOriginal.ImageUrl = novaImagem;
+            if (arquivoFoto != null && arquivoFoto.Length > 0)
+            {
+                var novaImagem = await AtualizarFoto(produtoOriginal.ImageUrl, arquivoFoto);
+                produtoOriginal.ImageUrl = novaImagem;
+            }
+            await repository.UpdateProductAsync(produtoOriginal);
+            return Result<bool>.Success(true);
         }
-        var response = await repository.UpdateProductAsync(produtoOriginal);
-        if (!response.IsSuccess)
+        catch (Exception ex)
         {
-            return Result<bool>.Failure(response.Error);
+            logger.LogError(ex, "Erro ao tentar atualizar o produto ID: {Id}", product.Id);
+            return Result<bool>.Failure("Não foi possível atualizar as informações do produto.");
         }
-
-        return Result<bool>.Success(true);
-
     }
 
     private async Task<string> AtualizarFoto(string caminhoAtual, IFormFile novaFoto)
     {
-        // Se houver uma foto antiga, tenta removê-la antes de salvar a nova
         if (!string.IsNullOrEmpty(caminhoAtual))
         {
             await fileService.DeleteFileAsync(caminhoAtual);
         }
-
         var novoPath = await fileService.SaveFileAsync(novaFoto, "img/products");
-
         return novoPath;
     }
 }

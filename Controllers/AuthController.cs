@@ -8,20 +8,19 @@ namespace VitrineSemiJoias.Controllers;
 
 public class AuthController(IAuthService service, IMapper mapper) : Controller
 {
-    // GET: AuthController
     [HttpGet]
-    public IActionResult Login()
+    public IActionResult Login([FromQuery] string? returnUrl = null)
     {
-        // Se o usuário já estiver autenticado, redireciona para a Home
         if (User.Identity?.IsAuthenticated ?? false)
             return RedirectToAction("Index", "Products");
-
+        
+        ViewData["ReturnUrl"] = returnUrl;
         return View();
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel loginVM)
+    public async Task<IActionResult> Login(LoginViewModel loginVM, [FromQuery] string? returnUrl = null)
     {
         if (!ModelState.IsValid) return View(loginVM);
 
@@ -29,17 +28,23 @@ public class AuthController(IAuthService service, IMapper mapper) : Controller
         var result = await service.ValidateUserAsync(loginDto);
 
         if (!result.IsSuccess)
-        {
+        {            
             ModelState.AddModelError(string.Empty, result.Error);
             return View(loginVM);
         }     
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return Redirect(returnUrl);
+        }
+
         return RedirectToAction("Index", "Products");
     }
 
     [HttpPost]
-    public async Task<IActionResult> Logout()
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
-        await service.Logout();
+        await service.Logout(cancellationToken);
         return RedirectToAction("Login");
     }    
 }

@@ -1,7 +1,8 @@
 ﻿@model VitrineSemiJoias.ViewModels.LoginViewModel
 
 @{
-    Layout = null; // Remove qualquer vínculo com layouts globais
+    Layout = null; 
+    var returnUrl = ViewData["ReturnUrl"] as string;
 }
 
 <!DOCTYPE html>

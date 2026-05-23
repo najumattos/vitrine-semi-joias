@@ -42,6 +42,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
+builder.Services.Configure<MostruarioOptions>(builder.Configuration.GetSection("Mostruario"));
 builder.Services.AddSmartServices();
 builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 

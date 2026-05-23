@@ -1,14 +1,20 @@
+using System.Globalization;
 using System.Text;
+using Microsoft.Extensions.Options;
 using VitrineSemiJoias.Common;
+using VitrineSemiJoias.Configurations;
 using VitrineSemiJoias.DTOs;
 using VitrineSemiJoias.Services.Interfaces;
 
 namespace VitrineSemiJoias.Services;
 
-public class CartService(IProductService productService, IHttpContextAccessor httpContextAccessor) : ICartService
+public class CartService(
+    IProductService productService,
+    IHttpContextAccessor httpContextAccessor,
+    IOptions<MostruarioOptions> mostruarioOptions) : ICartService
 {
     private const string SessionKey = "CartItems";
-
+private readonly MostruarioOptions _config = mostruarioOptions.Value;
     public async Task<Result> AddItemAsync(int productId)
     {
         if (productId <= 0)
@@ -77,23 +83,29 @@ public class CartService(IProductService productService, IHttpContextAccessor ht
         {
             return Result<string>.Failure("Carrinho vazio. Não é possível gerar a mensagem.");
         }
-
+        var culturaBr = new CultureInfo("pt-BR");
+        var whatsappNumber = string.IsNullOrWhiteSpace(_config.WhatsAppNumber)
+            ? "5514920044824"
+            : _config.WhatsAppNumber.Trim();
+        var ownerName = string.IsNullOrWhiteSpace(_config.OwnerName)
+            ? "Ana Julia"
+            : _config.OwnerName.Trim();
+        
         var items = cartResult.Value;
         var subtotal = items.Sum(item => item.Price);
         var currentDateTime = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
-        var whatsappNumber = "5514981544857";
 
         var messageBuilder = new StringBuilder();
-        messageBuilder.AppendLine("Olá Camila, aqui está o resumo do pedido montado através do mostruario virtual");
+        messageBuilder.AppendLine($"Olá {ownerName}, aqui está o resumo do pedido montado através do mostruario virtual");
         messageBuilder.AppendLine("-----------------------");
-        messageBuilder.AppendLine($"SubTotal: R$ {subtotal:F2}");
+        messageBuilder.AppendLine($"SubTotal: {subtotal.ToString("C", culturaBr)}");
         messageBuilder.AppendLine($"Horario: {currentDateTime}");
 
         foreach (var item in items)
         {
             messageBuilder.AppendLine("-----------------------");
             messageBuilder.AppendLine($"# {item.JewelryCode} | {item.Title}");
-            messageBuilder.AppendLine($"R$ {item.Price:F2}");
+            messageBuilder.AppendLine($"R$ {item.Price.ToString("C", culturaBr)}");
         }
 
         var messageText = messageBuilder.ToString();

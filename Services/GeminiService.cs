@@ -29,18 +29,15 @@ public class GeminiService(
                 return Result<string>.Failure("Tipo de arquivo inválido.");
             }
 
-            // 1. Prioriza a variável de ambiente (Produção/Azure) e depois o appsettings mapeado no Options
             var apiKey = Environment.GetEnvironmentVariable("GEMINI_API_KEY") ?? _config.ApiKey;
 
             if (string.IsNullOrWhiteSpace(apiKey))
             {
                 logger.LogError("Chave da API Gemini não configurada.");
                 return Result<string>.Failure("A integração de IA não está configurada no servidor.");
-            }
-
-            // 2. Os fallbacks agora podem ser tratados com coalescência nula direta das propriedades tipadas
+            }           
             var model = string.IsNullOrWhiteSpace(_config.Model) ? "gemini-2.5-flash" : _config.Model;
-            var prompt = string.IsNullOrWhiteSpace(_config.Prompt) ? "Recomende uma receita de bolo bem diferente e criativa com passo a passo e modo de preparo" : _config.Prompt;
+            var prompt = string.IsNullOrWhiteSpace(_config.Prompt) ? "Recomende uma receita de bolo bem diferente e criativa contendo apenas o passo a passo e modo de preparo em no máximo 500 caracteres" : _config.Prompt;
 
             using var memoryStream = new MemoryStream();
             await fileStream.CopyToAsync(memoryStream, cancellationToken);

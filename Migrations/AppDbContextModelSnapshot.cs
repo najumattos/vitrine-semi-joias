@@ -199,19 +199,6 @@ namespace VitrineSemiJoias.Migrations
                         .IsUnique();
 
                     b.ToTable("Products", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CategoryEnum = "Anel",
-                            Description = "Anel solitário clássico confeccionado em prata 925 com pedra de zircônia central.",
-                            ImageUrl = "wwwroot/img/seedAnel",
-                            IsAvailable = true,
-                            JewelryCode = 1001,
-                            Price = 129.90m,
-                            Title = "Anel Solitário de Prata Zircônia"
-                        });
                 });
 
             modelBuilder.Entity("VitrineSemiJoias.Models.UserModel", b =>
@@ -298,17 +285,17 @@ namespace VitrineSemiJoias.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "68958a0f-209a-426a-9179-e7dc55438e86",
+                            ConcurrencyStamp = "cc23197a-9ef6-4354-a025-80794209dbc2",
                             Email = "camila@admin.com",
-                            EmailConfirmed = false,
+                            EmailConfirmed = true,
                             LockoutEnabled = false,
                             Name = "Camila Reis",
                             NormalizedEmail = "CAMILA@ADMIN.COM",
                             NormalizedUserName = "CAMILA@ADMIN.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJUcXLoVZioGgNc+8MmqqZHJt0DMsGGuXxZowl9oOkAATvRQ5Ro3QK4BU7C9Pbi/Hw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECBW7yPYNlTelZ3MWpjLSIzBj4exYEtp/au1KXJDA0jmrY25mqJzGWBvXNp8YL5LJw==",
                             PhoneNumberConfirmed = false,
-                            Profile = "0",
-                            SecurityStamp = "03068a27-3622-49bc-94c0-7fb6f2cb6922",
+                            Profile = "Admin",
+                            SecurityStamp = "937c4a6c-0d92-4783-927c-43320f57172f",
                             TwoFactorEnabled = false,
                             UserName = "camila@admin.com"
                         });

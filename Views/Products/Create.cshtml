@@ -211,12 +211,19 @@
                 spinnerGerarDescricaoIA.style.display = 'inline-block';
 
                 try {
+                    // Append antiforgery token (if present) so ASP.NET's ValidateAntiForgeryToken accepts the request
+                    const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                    if (tokenInput && tokenInput.value) {
+                        formData.append('__RequestVerificationToken', tokenInput.value);
+                    }
+
                     const response = await fetch('@Url.Action("GenerateDescription", "Products")', {
                         method: 'POST',
                         body: formData,
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
-                        }
+                        },
+                        credentials: 'same-origin'
                     });
 
                     const data = await response.json();

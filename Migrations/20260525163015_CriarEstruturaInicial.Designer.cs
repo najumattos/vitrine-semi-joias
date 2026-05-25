@@ -12,8 +12,8 @@ using VitrineSemiJoias.Data;
 namespace VitrineSemiJoias.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260517211736_AdicionandoIdentity")]
-    partial class AdicionandoIdentity
+    [Migration("20260525163015_CriarEstruturaInicial")]
+    partial class CriarEstruturaInicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -185,13 +185,11 @@ namespace VitrineSemiJoias.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
+                    b.Property<int>("JewelryCode")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("StockQuantity")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(1);
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -199,6 +197,9 @@ namespace VitrineSemiJoias.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("JewelryCode")
+                        .IsUnique();
 
                     b.ToTable("Products", (string)null);
                 });
@@ -287,17 +288,17 @@ namespace VitrineSemiJoias.Migrations
                         {
                             Id = 1,
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8c2d41bd-2ac4-4182-8ddd-d664c8fb0cbf",
+                            ConcurrencyStamp = "cc23197a-9ef6-4354-a025-80794209dbc2",
                             Email = "camila@admin.com",
-                            EmailConfirmed = false,
+                            EmailConfirmed = true,
                             LockoutEnabled = false,
                             Name = "Camila Reis",
                             NormalizedEmail = "CAMILA@ADMIN.COM",
                             NormalizedUserName = "CAMILA@ADMIN.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEH+hRYaJITDGiH2bWqjPSi9sEZlBJfXyFhAoJ1+E5XNF2Vw4cG3JBi2Mtn5NcqsEQg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECBW7yPYNlTelZ3MWpjLSIzBj4exYEtp/au1KXJDA0jmrY25mqJzGWBvXNp8YL5LJw==",
                             PhoneNumberConfirmed = false,
-                            Profile = "0",
-                            SecurityStamp = "6aec7b2c-cf66-4b36-9734-f5601351dce2",
+                            Profile = "Admin",
+                            SecurityStamp = "937c4a6c-0d92-4783-927c-43320f57172f",
                             TwoFactorEnabled = false,
                             UserName = "camila@admin.com"
                         });

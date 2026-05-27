@@ -30,7 +30,7 @@ jobs:
     # 🔥 Separando os testes para logs mais limpos na esteira:
     
     - name: 5. Executar Testes Unitários
-      run: dotnet test Tests/VitrineSemiJoias.Tests/ --no-build --verbosity minimal
+      run: dotnet test Tests/VitrineSemiJoias.UnitTests/ --no-build --verbosity minimal
 
     - name: 6. Executar Testes de Integração
       run: dotnet test Tests/VitrineSemiJoias.IntegrationTests/ --no-build --verbosity normal

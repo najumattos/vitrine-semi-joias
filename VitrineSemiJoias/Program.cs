@@ -22,9 +22,9 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION")
-    ?? throw new InvalidOperationException("A variável 'DB_CONNECTION' não foi encontrada no arquivo .env"); 
-
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("A string de conexão 'DefaultConnection' não foi encontrada no appsettings.json");
+    
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 

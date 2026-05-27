@@ -4,6 +4,22 @@
 
 Site desenvolvido em ASP.NET Core 8 MVC para o **FDEVS2026** que serve como catálogo interativo e gerenciador de vitrine digital. O sistema foi projetado sob princípios sólidos de engenharia de software para otimizar a exibição de produtos, profissionalizar o contato com o cliente e eliminar gargalos logísticos do comércio tradicional por redes sociais.
 
+## Sumário
+
+- [Desafios FDevs](./Docs/Desafios-banco-de-dados/README.md)
+- [Documentacao WebSite](./VitrineSemiJoias/READMEmvc.md)
+- [Documentacao Projeto de Testes](./Tests/READMEtests.md)
+- [Neste Readme](#neste-readme)
+  - [O Cenário & O Problema](#o-cenário--o-problema)
+  - [A Solução Desenvolvida](#a-solução-desenvolvida)
+  - [Benefícios para o Negócio](#benefícios-para-o-negócio)
+  - [Funcionalidades](#funcionalidades)
+    - [Geração de Descrição com IA](#geração-de-descrição-com-ia)
+  - [Como Executar o Projeto](#como-executar-o-projeto)
+  - [Stack Tecnológica](#stack-tecnológica)
+  - [Próximas Etapas & Roadmap de Evolução](#próximas-etapas--roadmap-de-evolução)
+
+
 ## 🎯 O Cenário & O Problema
 
 O modelo original de vendas da marca baseava-se na postagem em massa de fotos no Status do WhatsApp. Embora acessível, essa abordagem gerava dores profundas para a empreendedora e suas clientes:
@@ -20,17 +36,15 @@ O modelo original de vendas da marca baseava-se na postagem em massa de fotos no
 
 O sistema centraliza o catálogo de forma persistente, leve e sempre disponível, transformando a experiência de compra e venda.
 
-> 📝 **Nota de Implementação:** Para conferir os detalhes técnicos do WebSite, acesse o **[README do projeto MVC](./Tests/READMEmvc.md)**.
+> 📝 **Nota de Implementação:** Para conferir os detalhes técnicos do WebSite, acesse o **[README do projeto MVC](./VitrineSemiJoias/READMEmvc.md)**.
 
-## 👩‍💻 Benefícios para a Cliente
+## 💼 Benefícios para o Negócio
 
 ***Navegação Fluida:** Interface responsiva e otimizada para carregar rapidamente em redes móveis limitadas;
 
 ***Filtro Inteligente:** Escaneamento rápido de peças por categorias (Anéis, Brincos, Colares), sem a necessidade de rolar por dezenas de stories expirados;
 
-***Visualização Avançada:** Modais intuitivos para conferir códigos, especificações de banho e preços de forma imediata antes de iniciar o atendimento.
-
-## 💼 Benefícios para o Negócio
+***Visualização Avançada:** Modais intuitivos para conferir códigos, especificações de banho e preços de forma imediata antes de iniciar o atendimento;
 
 ***Catálogo Permanente:** Fim do ciclo de expiração de 24 horas. O produto fica disponível na nuvem, a disponibidade e exibição das peça pode ser alterada com facilidade na área administrativa;
 
@@ -96,12 +110,6 @@ Para configurar o recurso, preencha a seção `Gemini` no `appsettings.json`:
 ```
 
 * **Validação do arquivo:** o fluxo aceita apenas imagens válidas e exibe feedback quando o arquivo selecionado é inválido ou excede o tamanho permitido.
-
-## 🧪 Arquitetura de Testes & Qualidade
-
-Para garantir a confiabilidade das regras de negócio e a estabilidade das integrações, o sistema conta com uma suíte de testes automatizados e uma esteira de Integração Contínua (CI) configurada via GitHub Actions.
-
-> 📝 **Nota de Implementação:** Para conferir os detalhes técnicos de cobertura, cenários testados, padrões adotados e instruções de execução, acesse o **[README do projeto de testes](./Tests/READMEtests.md)**.
 
 ## 🚀 Como Executar o Projeto
 
@@ -182,10 +190,13 @@ Uma conta administrador padrão é criada automaticamente nas migrations:
 * **jQuery & jQuery Validation** - Manipulação assíncrona do carrinho e validações client-side.
 
 ### 🧪 Qualidade de Código & CI/CD
+Para garantir a confiabilidade das regras de negócio e a estabilidade das integrações, o sistema conta com uma suíte de testes automatizados e uma esteira de Integração Contínua (CI) configurada via GitHub Actions.
 
 * **xUnit** - Ecossistema para execução de testes automatizados.
 * **NSubstitute** - Ferramenta para criação de dublês de teste (Mocks) de forma fluida.
 * **GitHub Actions** - Automação da esteira de Integração Contínua (CI).
+
+> 📝 **Nota de Implementação:** Para conferir os detalhes técnicos de cobertura, cenários testados, padrões adotados e instruções de execução, acesse o **[README do projeto de testes](./Tests/READMEtests.md)**.
 
 ## 🔮 Próximas Etapas & Roadmap de Evolução
 

@@ -1,4 +1,6 @@
-# Testes
+![CI Pipeline](https://github.com/najumattos/vitrine-semi-joias/actions/workflows/ci.yml/badge.svg)
+
+# :alembic: Testes
 
 Este projeto adota uma estratégia de testes em duas camadas para equilibrar velocidade, isolamento e confiança na entrega.
 

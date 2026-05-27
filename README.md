@@ -6,7 +6,7 @@ Site desenvolvido em ASP.NET Core 8 MVC para o **FDEVS2026** que serve como cat√
 
 ## Sum√°rio
 
-- [Desafios FDevs](./Docs/Desafios-banco-de-dados/README.md)
+- [Desafios FDevs](./Docs/DesafioProposto.md)
 - [Documentacao WebSite](./VitrineSemiJoias/READMEmvc.md)
 - [Documentacao Projeto de Testes](./Tests/READMEtests.md)
 - [Neste Readme](#neste-readme)

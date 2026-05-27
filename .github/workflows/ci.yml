@@ -1,0 +1,31 @@
+name: Pipeline de Testes Automatizados
+
+# 1. Quando o GitHub deve rodar essa esteira?
+on:
+  push:
+    branches: [ "main" ] # Roda ao fazer push nessa branch
+  pull_request:
+    branches: [ "main" ]            # Roda quando criarem um Pull Request
+
+# 2. O que a máquina do GitHub vai fazer?
+jobs:
+  executar-testes:
+    runs-on: ubuntu-latest # Cria uma máquina virtual Linux zerada
+
+    steps:
+    - name: 1. Baixar o código do repositório
+      uses: actions/checkout@v4
+
+    - name: 2. Instalar o .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json 
+
+    - name: 3. Restaurar dependências (NuGet)
+      run: dotnet restore
+
+    - name: 4. Compilar o projeto (Build)
+      run: dotnet build --no-restore
+
+    - name: 5. Rodar os Testes Unitários
+      run: dotnet test --no-build --verbosity normal

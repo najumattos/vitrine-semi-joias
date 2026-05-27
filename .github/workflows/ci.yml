@@ -19,7 +19,7 @@ jobs:
     - name: 2. Instalar o .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        global-json-file: global.json 
+        dotnet-version: '8.0' 
 
     - name: 3. Restaurar dependências (NuGet)
       run: dotnet restore

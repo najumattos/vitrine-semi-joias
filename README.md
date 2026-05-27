@@ -17,10 +17,11 @@ O modelo original de vendas da marca baseava-se na postagem em massa de fotos no
 ## 🚀 A Solução Desenvolvida
 
 O sistema centraliza o catálogo de forma persistente, leve e sempre disponível, transformando a experiência de compra e venda.
+> 📝 **Nota de Implementação:** Para conferir os detalhes técnicos do WebSite, acesse o **[README do projeto MVC](./Tests/READMEmvc.md)**.
 
 ## 👩‍💻 Benefícios para a Cliente
 
-***Navegação Fluida (Mobile-First):** Interface responsiva e otimizada para carregar rapidamente em redes móveis limitadas;
+***Navegação Fluida:** Interface responsiva e otimizada para carregar rapidamente em redes móveis limitadas;
 
 ***Filtro Inteligente:** Escaneamento rápido de peças por categorias (Anéis, Brincos, Colares), sem a necessidade de rolar por dezenas de stories expirados;
 
@@ -33,63 +34,6 @@ O sistema centraliza o catálogo de forma persistente, leve e sempre disponível
 ***Otimização do Tempo Presencial:** A cliente navega pela vitrine antes do encontro presencial, selecionando previamente as peças de interesse, tornando o atendimento focado e estratégico;
 
 ***Painel Administrativo Isolado:** Controle absoluto para cadastro, edição, exclusão e gerenciamento visual de estoque/disponibilidade.
-
-## 🏗️ Arquitetura e Padrões de Projeto
-
-O projeto adota uma arquitetura em camadas, fundamentada nos princípios SOLID e no desacoplamento de código para garantir manutenibilidade e testabilidade.
-
-```mermaid
-
-
-flowchart  TB
-
-
-Views["Views (Apresentação)"]  -->  Controllers["Controllers (Orquestração)"]
-
-
-Controllers  -->  Services["Services (Lógica de Negócio)\nDTOs (Transferência de Dados)"]
-
-
-Services  -->  Repositories["Repositories (Acesso a Dados)"]
-
-
-Repositories  -->  Persistence["Models + DbContext (Persistência)"]
-
-
-```
-
-## 🔄 Padrões Implementados
-
-***Repository Pattern:** Abstração completa da camada de dados (IProductRepository), isolando o Entity Framework das regras de negócio e facilitando a escrita de testes unitários;
-
-***Service Layer Pattern:** Toda a lógica de negócio, validações e regras de validação visual ficam concentradas na camada de serviços (ProductService), mantendo os Controllers limpos;
-
-***Data Transfer Objects (DTOs) & ViewModels:** Proteção das entidades de domínio. O tráfego de dados entre camadas é mapeado via DTOs, e a exibição final é tratada em ViewModels customizadas;
-
-***Dependency Injection (DI):** Gerenciamento centralizado do tempo de vida das dependências configurado de forma limpa em `Configurations/DependencyInjectionConfig.cs`;
-
-***AutoMapper Integration:** Eliminação de código boilerplate. O mapeamento entre objetos (Model ↔ DTO ↔ ViewModel) ocorre de forma automatizada e segura:
-
-```mermaid
-
-
-flowchart  LR
-
-
-Model["Model"]  -->  Mapper1["AutoMapper"]  -->  DTO["DTO"]  -->  Mapper2["AutoMapper"]  -->  ViewModel["ViewModel"]  -->  View["View"]
-
-
-```
-
-***Tratamento de Erros e Padrões de Falha:** Abordagem prática aplicada no projeto:
-
-  ***Serviços:** A camada de `Services` captura exceções em `try/catch`, registra o erro (`logger.LogError`) e converte o resultado em `Result`/`Result<T>`; quando necessário faz limpeza de efeitos colaterais (por exemplo, remover imagens gravadas em disco se o cadastro falhar).
-
-  ***Controllers:** Validações e guard-clauses (ModelState, parâmetros nulos, enums inválidos) são tratadas com `Early Return`, retornando `NotFound`, `BadRequest` ou mensagens amigáveis via `TempData` sem criar aninhamento profundo.
-
-  ***Handler global:** Em ambiente não-desenvolvimento, `UseExceptionHandler` centraliza o tratamento de exceções não previstas e redireciona para `HomeController.Error` para uma página de erro unificada.
-
-  ***Fail-Fast (parcial):** O projeto aplica rejeição precoce para entradas inválidas, porém adota um modelo de falha controlada na camada de serviço (captura de exceções e retorno encapsulado) em vez de permitir que exceções não tratadas subam livremente
 
 ## ✨ Funcionalidades
 
@@ -148,67 +92,14 @@ Para configurar o recurso, preencha a seção `Gemini` no `appsettings.json`:
 
 ```
 
-***Model:** define o modelo usado na chamada à API do Gemini.
 
-***Prompt:** orienta o texto que a IA deve gerar para a descrição da joia.
 
-***ApiKey:** armazena a chave de acesso da API; quando preferir, a aplicação também lê a variável de ambiente `GEMINI_API_KEY`.
+* **Validação do arquivo:** o fluxo aceita apenas imagens válidas e exibe feedback quando o arquivo selecionado é inválido ou excede o tamanho permitido.
 
-***Validação do arquivo:** o fluxo aceita apenas imagens válidas e exibe feedback quando o arquivo selecionado é inválido ou excede o tamanho permitido.
+## 🧪 Arquitetura de Testes & Qualidade
 
-## 🗄️ Estrutura do Banco de Dados
-
-O banco de dados do projeto combina as tabelas de negócio com a estrutura padrão do ASP.NET Core Identity. O diagrama abaixo foi simplificado para destacar apenas as tabelas usadas diretamente no projeto; as demais tabelas do Identity existem como infraestrutura do próprio framework e não fazem parte da lógica de domínio da aplicação:
-
-```mermaid
-
-erDiagram
-
-  PRODUCTS {
-
-    int Id PK
-
-    int JewelryCode
-
-    string Title
-
-    string Description
-
-    decimal Price
-
-    string ImageUrl
-
-    int CategoryEnum
-
-    bool IsAvailable
-
-  }
-
-  ASPNETUSERS {
-
-    int Id PK
-
-    string UserName
-
-    string NormalizedUserName
-
-    string Email
-
-    string NormalizedEmail
-
-    string Name
-
-    int Profile
-
-  }
-
-```
-
-***Products:** tabela principal do catálogo, controlada pelo `AppDbContext` e usada no CRUD administrativo.
-
-***AspNetUsers:** usuários autenticáveis do sistema, com os campos adicionais `Name` e `Profile` definidos em `UserModel`.
-
-***Observação:** a aplicação não possui relacionamento direto entre `Products` e as tabelas do Identity; o vínculo de autenticação é independente da gestão do catálogo.
+Para garantir a confiabilidade das regras de negócio e a estabilidade das integrações, o sistema conta com uma suíte de testes automatizados e uma esteira de Integração Contínua (CI) configurada via GitHub Actions.
+> 📝 **Nota de Implementação:** Para conferir os detalhes técnicos de cobertura, cenários testados, padrões adotados e instruções de execução, acesse o **[README do projeto de testes](./Tests/READMEtests.md)**.
 
 ## 🚀 Como Executar o Projeto
 
@@ -220,88 +111,44 @@ erDiagram
 
 -**Git** - Para clonar o repositório
 
-### Passo 1: Clonar o Repositório
+* Clonar o Repositório
 
 ```bash
-
 gitclonehttps://github.com/seu-usuario/vitrine-semi-joias.git
 
-cdvitrine-semi-joias
-
+cd vitrine-semi-joias
 ```
 
-### Passo 2: Restaurar Dependências
-
+* Restaurar Dependências
 ```bash
-
 dotnetrestore
-
 ```
 
-### Passo 3: Executar o Script SQL do Banco de Dados
-
+* Executar o Script SQL do Banco de Dados
 ```bash
-
 sqlcmd-S"(localdb)\MSSQLLocalDB"-dDB_Vitrine_Semi_Joias-i.\Data\INSERTS.sql
-
 ```
 
-### Passo 4: Executar a Aplicação
-
+* Executar a Aplicação
 ```bash
-
-dotnetrun
-
+dotnet watch run
 ```
 
 A aplicação estará disponível em: `https://localhost:7000` ou `http://localhost:5000`
 
-### Desenvolvimento com Watch Mode (Opcional)
-
-Para reiniciar automaticamente ao salvar mudanças:
-
-```bash
-
-dotnetwatchrun
-
-```
-
 ---
 
-## 📁 Estrutura de Pastas
+### 📁 Estrutura do Projeto
 
-```
-
-vitrine-semi-joias/
-
-├── Controllers/         # Controladores MVC
-
-├── Models/              # Modelos de domínio
-
-├── DTOs/                # Data Transfer Objects
-
-├── ViewModels/          # Modelos para Views
-
-├── Services/            # Lógica de negócio
-
-├── Repository/          # Padrão Repository
-
-├── Data/                # Configuração do DbContext e Entidades
-
-├── Migrations/          # Migrations do Entity Framework
-
-├── Views/               # Templates Razor
-
-├── wwwroot/             # Arquivos estáticos (CSS, JS, imagens)
-
-├── Common/              # Utilitários compartilhados
-
-├── Configurations/      # Configurações de DI e AutoMapper
-
-├── Enums/               # Enumerações
-
-└── Properties/          # Configurações do projeto
-
+```text
+VITRINE-SEMI-JOIAS/
+├── .github/              # Configurações do GitHub (Workflows de CI/CD)
+├── Docs/                 # Documentação complementar do projeto
+├── Tests/                # Projetos de testes (Unitários e de Integração)
+├── VitrineSemiJoias/     # Código-fonte principal da Aplicação Web
+├── .gitignore            # Arquivo de mapeamento para ignorar no Git
+├── README.md             # Documentação principal do repositório
+└── VitrineSemiJoias.sln  # Arquivo de Solução do .NET
 ```
 
 ---
@@ -314,56 +161,25 @@ Uma conta administrador padrão é criada automaticamente nas migrations:
 
 -**Senha**: `123456`
 
-## 📚 Tecnologias Utilizadas
+## 📚 Stack Tecnológica
 
-| Tecnologia                      | Descrição                                  |
+### 🖥️ Backend & Infraestrutura
+* **.NET 8 & ASP.NET Core MVC** - Framework principal e padrão arquitetural da aplicação.
+* **Entity Framework Core** - ORM para mapeamento e persistência de dados.
+* **SQL Server** - Banco de dados relacional.
+* **ASP.NET Core Identity** - Mecanismo nativo para autenticação segura e controle de acesso.
+* **AutoMapper** - Abstração e mapeamento automatizado entre Entidades e DTOs.
 
-| ------------------------------- | -------------------------------------------- |
+### 🎨 Frontend & UI
+* **Bootstrap 5** - Framework CSS para estilização e responsividade mobile-first.
+* **jQuery & jQuery Validation** - Manipulação assíncrona do carrinho e validações client-side.
 
-| **.NET 8**                | Framework principal para desenvolvimento web |
-
-| **ASP.NET Core MVC**      | Padrão arquitetural Model-View-Controller   |
-
-| **Entity Framework Core** | ORM para acesso a dados                      |
-
-| **SQL Server**            | Banco de dados relacional                    |
-
-| **AutoMapper**            | Mapeamento automático entre objetos         |
-
-| **Bootstrap 5**           | Framework CSS responsivo                     |
-
-| **jQuery**                | Biblioteca JavaScript                        |
-
-| **ASP.NET Core Identity** | Autenticação e gerenciamento de usuários  |
-
----
-
-## 📝 Notas Importantes
-
-- ✅ Certifique-se de que a string de conexão está configurada corretamente;
-- ✅ As imagens carregadas são armazenadas em `wwwroot/img/`;
-- ✅ O projeto usa ASP.NET Core Identity para gerenciamento de usuários e autenticação;
-- ✅ O carrinho é salvo em sessão e a finalização do pedido gera o link/mensagem do WhatsApp
-
-## 🔌 Extensibilidade para API
-
-A aplicação hoje está configurada como **MVC com views Razor**. Isso significa que os controllers atuais atendem a páginas e fluxos tradicionais de navegação, mas a base já está preparada para evoluir para endpoints de API sem reestruturar o domínio.
-
-Na prática, a arquitetura atual já favorece essa evolução porque a lógica de negócio está concentrada em `Services/` e o acesso a dados em `Repository/`.
+### 🧪 Qualidade de Código & CI/CD
+* **xUnit** - Ecossistema para execução de testes automatizados.
+* **NSubstitute** - Ferramenta para criação de dublês de teste (Mocks) de forma fluida.
+* **GitHub Actions** - Automação da esteira de Integração Contínua (CI).
 
 ## 🔮 Próximas Etapas & Roadmap de Evolução
-
-### 🚀 1. Infraestrutura & DevOps (CI/CD)
-
-***Ambiente de Nuvem Gratuito:** Configuração do provisionamento do ecossistema da aplicação (Web App .NET 8 + Banco de Dados SQL Server) na nuvem, utilizando os benefícios e créditos do **GitHub Student Developer Pack**.
-
-***Deploy Contínuo (CI/CD):** Criação de esteiras automatizadas através do **GitHub Actions**. A cada `git push origin main`, o fluxo disparará o gatilho para build, empacotamento e atualização automática do ambiente de produção no Azure, eliminando deploys manuais.
-
-### 🧪 2. Qualidade de Software & Testes
-
-***Testes Automatizados na Pipeline:** Implementação de testes unitários básicos e de integração para a camada de serviços (`Services`) e repositórios.
-
-***Validação de CI:** Integração dos testes ao fluxo do GitHub Actions, garantindo que o deploy só seja concluído se todas as asserções de código passarem com sucesso (Garantia de não-regressão).
 
 ### 🎨 3. Experiência do Usuário (UI/UX) & Frontend
 

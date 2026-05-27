@@ -5,7 +5,7 @@ on:
   push:
     branches: [ "main" ] # Roda ao fazer push nessa branch
   pull_request:
-    branches: [ "main" ]            # Roda quando criarem um Pull Request
+    branches: [ "main" ] # Roda quando criarem um Pull Request
 
 # 2. O que a máquina do GitHub vai fazer?
 jobs:
@@ -27,5 +27,10 @@ jobs:
     - name: 4. Compilar o projeto (Build)
       run: dotnet build --no-restore
 
-    - name: 5. Rodar os Testes Unitários
-      run: dotnet test --no-build --verbosity normal
+    # 🔥 Separando os testes para logs mais limpos na esteira:
+    
+    - name: 5. Executar Testes Unitários
+      run: dotnet test Tests/VitrineSemiJoias.Tests/ --no-build --verbosity minimal
+
+    - name: 6. Executar Testes de Integração
+      run: dotnet test Tests/VitrineSemiJoias.IntegrationTests/ --no-build --verbosity normal

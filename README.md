@@ -1,3 +1,5 @@
+![CI Pipeline](https://github.com/najumattos/vitrine-semi-joias/actions/workflows/ci.yml/badge.svg)
+
 # 💎 Camila Reis — Vitrine de Semijoias & Acessórios
 
 Site desenvolvido em ASP.NET Core 8 MVC para o **FDEVS2026** que serve como catálogo interativo e gerenciador de vitrine digital. O sistema foi projetado sob princípios sólidos de engenharia de software para otimizar a exibição de produtos, profissionalizar o contato com o cliente e eliminar gargalos logísticos do comércio tradicional por redes sociais.
@@ -17,6 +19,7 @@ O modelo original de vendas da marca baseava-se na postagem em massa de fotos no
 ## 🚀 A Solução Desenvolvida
 
 O sistema centraliza o catálogo de forma persistente, leve e sempre disponível, transformando a experiência de compra e venda.
+
 > 📝 **Nota de Implementação:** Para conferir os detalhes técnicos do WebSite, acesse o **[README do projeto MVC](./Tests/READMEmvc.md)**.
 
 ## 👩‍💻 Benefícios para a Cliente
@@ -92,13 +95,12 @@ Para configurar o recurso, preencha a seção `Gemini` no `appsettings.json`:
 
 ```
 
-
-
 * **Validação do arquivo:** o fluxo aceita apenas imagens válidas e exibe feedback quando o arquivo selecionado é inválido ou excede o tamanho permitido.
 
 ## 🧪 Arquitetura de Testes & Qualidade
 
 Para garantir a confiabilidade das regras de negócio e a estabilidade das integrações, o sistema conta com uma suíte de testes automatizados e uma esteira de Integração Contínua (CI) configurada via GitHub Actions.
+
 > 📝 **Nota de Implementação:** Para conferir os detalhes técnicos de cobertura, cenários testados, padrões adotados e instruções de execução, acesse o **[README do projeto de testes](./Tests/READMEtests.md)**.
 
 ## 🚀 Como Executar o Projeto
@@ -120,16 +122,19 @@ cd vitrine-semi-joias
 ```
 
 * Restaurar Dependências
+
 ```bash
 dotnetrestore
 ```
 
 * Executar o Script SQL do Banco de Dados
+
 ```bash
 sqlcmd-S"(localdb)\MSSQLLocalDB"-dDB_Vitrine_Semi_Joias-i.\Data\INSERTS.sql
 ```
 
 * Executar a Aplicação
+
 ```bash
 dotnet watch run
 ```
@@ -164,6 +169,7 @@ Uma conta administrador padrão é criada automaticamente nas migrations:
 ## 📚 Stack Tecnológica
 
 ### 🖥️ Backend & Infraestrutura
+
 * **.NET 8 & ASP.NET Core MVC** - Framework principal e padrão arquitetural da aplicação.
 * **Entity Framework Core** - ORM para mapeamento e persistência de dados.
 * **SQL Server** - Banco de dados relacional.
@@ -171,10 +177,12 @@ Uma conta administrador padrão é criada automaticamente nas migrations:
 * **AutoMapper** - Abstração e mapeamento automatizado entre Entidades e DTOs.
 
 ### 🎨 Frontend & UI
+
 * **Bootstrap 5** - Framework CSS para estilização e responsividade mobile-first.
 * **jQuery & jQuery Validation** - Manipulação assíncrona do carrinho e validações client-side.
 
 ### 🧪 Qualidade de Código & CI/CD
+
 * **xUnit** - Ecossistema para execução de testes automatizados.
 * **NSubstitute** - Ferramenta para criação de dublês de teste (Mocks) de forma fluida.
 * **GitHub Actions** - Automação da esteira de Integração Contínua (CI).

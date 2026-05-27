@@ -26,11 +26,11 @@ O modelo original de vendas da marca baseava-se na postagem em massa de fotos no
 
 ![Visualizacao atual](./Docs/imagemUm.jpg)
 
-***Gargalo de Conexão (UX Prejudicada):** O carregamento de dezenas de mídias sequenciais no WhatsApp consome muitos dados. Em conexões instáveis, as fotos demoram para carregar, gerando atrito e fazendo com que potenciais clientes desistam de ver as peças;
+* **Gargalo de Conexão (UX Prejudicada):** O carregamento de dezenas de mídias sequenciais no WhatsApp consome muitos dados. Em conexões instáveis, as fotos demoram para carregar, gerando atrito e fazendo com que potenciais clientes desistam de ver as peças;
 
-***Refugo de Trabalho e Volatilidade:** Como os status expiram rigidamente a cada 24 horas, havia a necessidade constante de reupload manual das mesmas mídias, gerando um esforço repetitivo e ineficiente;
+* **Refugo de Trabalho e Volatilidade:** Como os status expiram rigidamente a cada 24 horas, havia a necessidade constante de reupload manual das mesmas mídias, gerando um esforço repetitivo e ineficiente;
 
-***Desgaste Logístico:** A marca realiza atendimentos presenciais e a domicílio. Depender exclusivamente do transporte e da abertura do mostruário físico para apresentar todo o catálogo gera desgaste prático, além de limitar o tempo de escolha da cliente.
+* **Desgaste Logístico:** A marca realiza atendimentos presenciais e a domicílio. Depender exclusivamente do transporte e da abertura do mostruário físico para apresentar todo o catálogo gera desgaste prático, além de limitar o tempo de escolha da cliente.
 
 ## 🚀 A Solução Desenvolvida
 
@@ -40,17 +40,17 @@ O sistema centraliza o catálogo de forma persistente, leve e sempre disponível
 
 ## 💼 Benefícios para o Negócio
 
-***Navegação Fluida:** Interface responsiva e otimizada para carregar rapidamente em redes móveis limitadas;
+* **Navegação Fluida:** Interface responsiva e otimizada para carregar rapidamente em redes móveis limitadas;
 
-***Filtro Inteligente:** Escaneamento rápido de peças por categorias (Anéis, Brincos, Colares), sem a necessidade de rolar por dezenas de stories expirados;
+* **Filtro Inteligente:** Escaneamento rápido de peças por categorias (Anéis, Brincos, Colares), sem a necessidade de rolar por dezenas de stories expirados;
 
-***Visualização Avançada:** Modais intuitivos para conferir códigos, especificações de banho e preços de forma imediata antes de iniciar o atendimento;
+* **Visualização Avançada:** Modais intuitivos para conferir códigos, especificações de banho e preços de forma imediata antes de iniciar o atendimento;
 
-***Catálogo Permanente:** Fim do ciclo de expiração de 24 horas. O produto fica disponível na nuvem, a disponibidade e exibição das peça pode ser alterada com facilidade na área administrativa;
+* **Catálogo Permanente:** Fim do ciclo de expiração de 24 horas. O produto fica disponível na nuvem, a disponibidade e exibição das peça pode ser alterada com facilidade na área administrativa;
 
-***Otimização do Tempo Presencial:** A cliente navega pela vitrine antes do encontro presencial, selecionando previamente as peças de interesse, tornando o atendimento focado e estratégico;
+* **Otimização do Tempo Presencial:** A cliente navega pela vitrine antes do encontro presencial, selecionando previamente as peças de interesse, tornando o atendimento focado e estratégico;
 
-***Painel Administrativo Isolado:** Controle absoluto para cadastro, edição, exclusão e gerenciamento visual de estoque/disponibilidade.
+* **Painel Administrativo Isolado:** Controle absoluto para cadastro, edição, exclusão e gerenciamento visual de estoque/disponibilidade.
 
 ## ✨ Funcionalidades
 
@@ -115,11 +115,11 @@ Para configurar o recurso, preencha a seção `Gemini` no `appsettings.json`:
 
 ### Pré-requisitos
 
--**.NET 8 SDK** `winget install Microsoft.DotNet.SDK.8`
+- **.NET 8 SDK** `winget install Microsoft.DotNet.SDK.8`
 
--**SQL Server** (ou LocalDB) - Incluído no Visual Studio
+- **SQL Server** (ou LocalDB) - Incluído no Visual Studio
 
--**Git** - Para clonar o repositório
+- **Git** - Para clonar o repositório
 
 * Clonar o Repositório
 
@@ -170,9 +170,9 @@ VITRINE-SEMI-JOIAS/
 
 Uma conta administrador padrão é criada automaticamente nas migrations:
 
--**Email**: `camila@admin.com`
+- **Email**: `camila@admin.com`
 
--**Senha**: `123456`
+- **Senha**: `123456`
 
 ## 📚 Stack Tecnológica
 
@@ -202,12 +202,12 @@ Para garantir a confiabilidade das regras de negócio e a estabilidade das integ
 
 ### 🎨 3. Experiência do Usuário (UI/UX) & Frontend
 
-***Trilha de Frontend FDEVS:** Evolução do frontend da vitrine aplicando conceitos maduros de UI/UX (Consistência visual, acessibilidade, hierarquia de elementos e micro-interações de feedback).
+* **Trilha de Frontend FDEVS:** Evolução do frontend da vitrine aplicando conceitos maduros de UI/UX (Consistência visual, acessibilidade, hierarquia de elementos e micro-interações de feedback).
 
-***Otimização de Mostruário:** Refinamento dos fluxos de navegação para tornar o catálogo ainda mais responsivo e fluido para o cliente final.
+* **Otimização de Mostruário:** Refinamento dos fluxos de navegação para tornar o catálogo ainda mais responsivo e fluido para o cliente final.
 
 ### 🛒 4. Funcionalidades de Negócio (Admin)
 
-***Módulo de Pedidos Admin:** Persistência de dados das intenções de compra geradas pelo carrinho assíncrono em uma tabela dedicada de `Pedidos` para rastreamento.
+* **Módulo de Pedidos Admin:** Persistência de dados das intenções de compra geradas pelo carrinho assíncrono em uma tabela dedicada de `Pedidos` para rastreamento.
 
-***Checkout Condicional:** Modificação do comportamento do fluxo de finalização caso o administrador esteja autenticado, direcionando-o para uma tela interna de gestão da ordem de serviço em vez do redirecionamento padrão para o WhatsApp do cliente.
+* **Checkout Condicional:** Modificação do comportamento do fluxo de finalização caso o administrador esteja autenticado, direcionando-o para uma tela interna de gestão da ordem de serviço em vez do redirecionamento padrão para o WhatsApp do cliente.

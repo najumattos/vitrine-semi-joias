@@ -55,6 +55,34 @@ Model["Model"]  -->  Mapper1["AutoMapper"]  -->  DTO["DTO"]  -->  Mapper2["AutoM
 
   ***Fail-Fast (parcial):** O projeto aplica rejeição precoce para entradas inválidas, porém adota um modelo de falha controlada na camada de serviço (captura de exceções e retorno encapsulado) em vez de permitir que exceções não tratadas subam livremente
 
+## ✨ Funcionalidades
+
+- 🛍️ **CRUD Completo de Produtos**: Interface administrativa para criar, visualizar, editar e excluir produtos. As ações respeitam regras de negócio (estoque, categorias e visibilidade) e retornam mensagens UX claras (sucesso/erro). A camada de serviço encapsula a lógica e a camada de repositório trata da persistência.
+
+- 📸 **Gerenciamento de Imagens**: Upload seguro de imagens com validação de tipo/bytes e redimensionamento opcional no servidor. Arquivos são armazenados em `wwwroot` com nomes gerados para evitar colisões e caminhos são persistidos no banco para exibição nas views.
+
+- 🗑️ **Exclusão de Arquivos Físicos**: Quando um produto é removido, o sistema elimina também os arquivos de imagem associados (se não usados por outros registros), evitando lixo no disco. A operação é realizada de forma transacional quando possível para manter consistência.
+
+- 🔐 **Autenticação Segura**: Integração com ASP.NET Core Identity para cadastro, login, logout, e recuperação de senha. Cookies de autenticação são configurados com políticas seguras e as rotas administrativas exigem autorização baseada em `ProfileEnum`.
+
+- 👤 **Área Administrativa**: Painel restrito a usuários autorizados para gerenciar catálogo e imagens. Controles com validação de entrada, proteção contra CSRF e feedback imediato para o usuário (TempData / toasts).
+
+- 📊 **Catálogo de Produtos**: Página pública com listagem paginada e filtros por categoria/preço. Dados são obtidos de forma otimizada pelo repositório (projeções via DTO/ViewModel) para evitar carregamento desnecessário de imagens ou propriedades.
+
+- 🛒 **Carrinho Assíncrono**: Adição/remoção de itens ao carrinho via chamadas AJAX, mantendo a experiência do usuário sem reload. Toastr (Bootstrap) apresenta confirmações e erros, e as operações atualizam a sessão do usuário em tempo real.
+
+- 🧾 **Carrinho em Sessão e Pedido via WhatsApp**: Itens do carrinho são mantidos na sessão (serializados como DTO/ViewModel). Ao finalizar, o sistema gera uma mensagem formatada pronta para envio via WhatsApp (URL/estrutura), facilitando a conversão de pedidos sem gateway de pagamento.
+
+- 🏷️ **Filtro de Categoria Persistente**: O seletor de categoria da vitrine salva a última seleção (via query string, sessão ou localStorage), garantindo que a escolha do cliente persista após reloads e navegações.
+
+- 💾 **Persistência de Dados (EF Core)**: Projeto usa Entity Framework Core com migrations para versionamento do esquema. Configurações de entidades (`ProductConfig`, `UserConfig`) seguem convenções e constraints para integridade referencial.
+
+- 🎨 **Interface Responsiva**: Front-end com Bootstrap adaptativo, classes utilitárias e componentes acessíveis para garantir boa apresentação em dispositivos móveis e desktops.
+
+- ✔️ **Validação de Dados (Cliente e Servidor)**: Validações combinadas: DataAnnotations no modelo/DTO, validação adicional na camada de serviço e validação client-side com jQuery Validation para melhor experiência e segurança.
+
+Cada uma dessas funcionalidades é implementada em camadas separadas (`Controllers`, `Services`, `Repository`, `DTOs`, `ViewModels`), seguindo princípios de responsabilidade única e facilitando testes automatizados.
+
 ## 🗄️ Estrutura do Banco de Dados
 
 O banco de dados do projeto combina as tabelas de negócio com a estrutura padrão do ASP.NET Core Identity. O diagrama abaixo foi simplificado para destacar apenas as tabelas usadas diretamente no projeto; as demais tabelas do Identity existem como infraestrutura do próprio framework e não fazem parte da lógica de domínio da aplicação:

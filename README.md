@@ -4,21 +4,25 @@
 
 Site desenvolvido em ASP.NET Core 8 MVC para o **FDEVS2026** que serve como catálogo interativo e gerenciador de vitrine digital. O sistema foi projetado sob princípios sólidos de engenharia de software para otimizar a exibição de produtos, profissionalizar o contato com o cliente e eliminar gargalos logísticos do comércio tradicional por redes sociais.
 
-## Sumário
+![Home Page](./Docs/homePage.png)
 
-- [Desafios FDevs](./Docs/DesafioProposto.md)
+## ⭐  Sumário
+  Neste Repositorio
+- [Desafios FDevs](./Docs/README-fdevs.md)
 - [Documentacao WebSite](./VitrineSemiJoias/READMEmvc.md)
 - [Documentacao Projeto de Testes](./Tests/READMEtests.md)
-- [Neste Readme](#neste-readme)
+---
+ Neste Readme
   - [O Cenário & O Problema](#o-cenário--o-problema)
   - [A Solução Desenvolvida](#a-solução-desenvolvida)
   - [Benefícios para o Negócio](#benefícios-para-o-negócio)
-  - [Funcionalidades](#funcionalidades)
+  - [Principais Funcionalidades](#funcionalidades)
     - [Geração de Descrição com IA](#geração-de-descrição-com-ia)
   - [Como Executar o Projeto](#como-executar-o-projeto)
   - [Stack Tecnológica](#stack-tecnológica)
   - [Próximas Etapas & Roadmap de Evolução](#próximas-etapas--roadmap-de-evolução)
 
+---
 
 ## 🎯 O Cenário & O Problema
 
@@ -52,61 +56,31 @@ O sistema centraliza o catálogo de forma persistente, leve e sempre disponível
 
 * **Painel Administrativo Isolado:** Controle absoluto para cadastro, edição, exclusão e gerenciamento visual de estoque/disponibilidade.
 
-## ✨ Funcionalidades
-
-- 🛍️ **CRUD Completo de Produtos** - Criar, ler, atualizar e deletar produtos com validações robustas
-- 📸 **Gerenciamento de Imagens** - Upload de arquivos de imagem com armazenamento seguro no servidor
-- 🗑️ **Exclusão de Arquivos Físicos** - Remoção automática de imagens quando produtos são deletados
-- 🔐 **Autenticação Segura** - Sistema de autenticação com ASP.NET Core Identity, cookies de autenticação e fluxo de "esqueci minha senha"
-- 👤 **Área Administrativa** - CRUD de produtos e fluxo de autenticação baseado em Identity
+## ✨ Principais Funcionalidades
 - 📊 **Catálogo de Produtos** - Visualização pública do catálogo de semi-jóias com filtros
-- 🛒 **Carrinho Assíncrono** - Adição de produtos ao pedido sem redirecionamento, com feedback visual via toast Bootstrap
-- 🧾 **Carrinho em Sessão e Pedido via WhatsApp** - Itens mantidos em sessão e finalização do pedido com geração de mensagem para o WhatsApp
-- 🏷️ **Filtro de Categoria Persistente** - O select da vitrine mantém a categoria selecionada após o reload da página
-- 💾 **Persistência de Dados** - Entity Framework Core com migrations automáticas
-- 🎨 **Interface Responsiva** - Bootstrap para design moderno e compatível com dispositivos móveis
-- ✔️ **Validação de Dados** - Validações no servidor e cliente (jQuery Validation)
+- 🔐 **Área Administrativa e Autenticação Segura** - Sistema de autenticação com ASP.NET Core Identity, cookies de autenticação
+- 🛍️ **CRUD Completo de Produtos** - Criar, ler, atualizar e deletar produtos com validações robustas
 
+![Produtos](./Docs/products.png)
+---
+- 🧾 **Carrinho em Sessão e Pedido via WhatsApp** - Itens mantidos em sessão e finalização do pedido com geração de mensagem para o WhatsApp
+
+![Pedido](./Docs/pedido.png)
+---
 ### 🤖 Geração de Descrição com IA
 
 O cadastro de produtos também conta com um fluxo opcional de apoio à escrita da descrição. Na tela de novo produto, o administrador seleciona uma imagem e usa o botão de geração para enviar o arquivo ao serviço de IA; a resposta retorna como texto pronto para edição antes do salvamento final.
 
-```mermaid
-
-flowchart TB
-
-    A["Tela de Cadastro de Produto"] --> B["Seleciona imagem"]
-
-    B --> C["Botão Gerar Descrição com IA"]
-
-    C --> D["ProductsController.GenerateDescription"]
-
-    D --> E["ProductService.GenerateDescriptionFromImageAsync"]
-
-    E --> F["GeminiService.GenerateJewelryDescriptionAsync"]
-
-    F --> G["Google Gemini API"]
-
-    G --> H["Retorna a descrição"]
-
-    H --> I["Textarea Description é preenchida"]
-
-```
+![Descricao Gerada](./Docs/IMGdescricao.png)
 
 Para configurar o recurso, preencha a seção `Gemini` no `appsettings.json`:
 
 ```json
-
 "Gemini": {
-
   "Model": "gemini-2.5-flash",
-
   "Prompt": "Descreva a peça com foco em material, banho, estilo e ocasião de uso.",
-
   "ApiKey": "SUA_CHAVE_GEMINI"
-
 }
-
 ```
 
 * **Validação do arquivo:** o fluxo aceita apenas imagens válidas e exibe feedback quando o arquivo selecionado é inválido ou excede o tamanho permitido.
@@ -114,37 +88,33 @@ Para configurar o recurso, preencha a seção `Gemini` no `appsettings.json`:
 ## 🚀 Como Executar o Projeto
 
 ### Pré-requisitos
-
 - **.NET 8 SDK** `winget install Microsoft.DotNet.SDK.8`
-
 - **SQL Server** (ou LocalDB) - Incluído no Visual Studio
-
 - **Git** - Para clonar o repositório
 
-* Clonar o Repositório
 
 ```bash
-gitclonehttps://github.com/seu-usuario/vitrine-semi-joias.git
-
-cd vitrine-semi-joias
+  git clone https://github.com/seu-usuario/vitrine-semi-joias.git
 ```
 
-* Restaurar Dependências
-
 ```bash
-dotnetrestore
+  cd vitrine-semi-joias
 ```
 
-* Executar o Script SQL do Banco de Dados
-
 ```bash
-sqlcmd-S"(localdb)\MSSQLLocalDB"-dDB_Vitrine_Semi_Joias-i.\Data\INSERTS.sql
+  dotnet restore
 ```
 
-* Executar a Aplicação
+```bash
+  dotnet ef database update
+```
 
 ```bash
-dotnet watch run
+  sqlcmd-S"(localdb)\MSSQLLocalDB"-dDB_Vitrine_Semi_Joias-i.\Data\INSERTS.sql
+```
+
+```bash
+  dotnet watch run
 ```
 
 A aplicação estará disponível em: `https://localhost:7000` ou `http://localhost:5000`

@@ -5,6 +5,8 @@
 * Tema do projeto livre;
 > Tema Escolhido: Crud De Produtos (Semi Joias)
 
+![CRUD de Joias](./products.png)
+
  ### Requisitos
  * CRUD de ao menos um recurso (ex.:“Produtos”, “Tarefas”);
  * Utilizar ASP.NET CoreMVC, EntityFrameworkCoree SQL Server;

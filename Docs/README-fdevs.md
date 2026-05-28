@@ -28,6 +28,6 @@
 
 [git-github]:https://blog-najuliarmattos.vercel.app/#/post/10
 [c-sharp]:./CSharp/
-[database]:./Desafios-banco-de-dados.md/
-[solid]:./PrincipiosSOLID/
-[desafio-final]:../VitrineSemiJoias/READMEmvc.md
+[database]:./Desafios-banco-de-dados/
+[solid]:./PrincipiosSOLID/README-solid.md/
+[desafio-final]:https://github.com/najumattos/vitrine-semi-joias

@@ -7,11 +7,6 @@ Site desenvolvido em ASP.NET Core 8 MVC para o **FDEVS2026** que serve como cat�
 ![Home Page](./Docs/homePage.png)
 
 ## ⭐  Sumário
-  Neste Repositorio
-- [Desafios FDevs](./Docs/README-fdevs.md)
-- [Documentacao WebSite](./VitrineSemiJoias/READMEmvc.md)
-- [Documentacao Projeto de Testes](./Tests/READMEtests.md)
----
  Neste Readme
   - [O Cenário & O Problema](#o-cenário--o-problema)
   - [A Solução Desenvolvida](#a-solução-desenvolvida)
@@ -21,7 +16,10 @@ Site desenvolvido em ASP.NET Core 8 MVC para o **FDEVS2026** que serve como cat�
   - [Como Executar o Projeto](#como-executar-o-projeto)
   - [Stack Tecnológica](#stack-tecnológica)
   - [Próximas Etapas & Roadmap de Evolução](#próximas-etapas--roadmap-de-evolução)
-
+---
+- [Documentacao Website](./VitrineSemiJoias/READMEmvc.md)
+- [Documentacao Projeto de Testes](./Tests/READMEtests.md)
+- [Repositorio FDevs](https://github.com/najumattos/FDEVS2026)
 ---
 
 ## 🎯 O Cenário & O Problema

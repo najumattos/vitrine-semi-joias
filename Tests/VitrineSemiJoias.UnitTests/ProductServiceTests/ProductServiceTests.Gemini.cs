@@ -10,7 +10,7 @@ public partial class ProductServiceTests
     public async Task GenerateDescriptionFromImageAsync_DeveRetornarFalha_QuandoArquivoForNulo()
     {
         // Act
-        var resultado = await _service.GenerateDescriptionFromImageAsync(null);
+        var resultado = await _service.GenerateDescriptionFromImageAsync(null, null);
 
         // Assert
         Assert.False(resultado.IsSuccess);
@@ -25,7 +25,7 @@ public partial class ProductServiceTests
         arquivoMock.Length.Returns(0); // Tamanho zero (vazio)
 
         // Act
-        var resultado = await _service.GenerateDescriptionFromImageAsync(arquivoMock);
+        var resultado = await _service.GenerateDescriptionFromImageAsync(arquivoMock, null);
 
         // Assert
         Assert.False(resultado.IsSuccess);
@@ -46,7 +46,7 @@ public partial class ProductServiceTests
         arquivoMock.ContentType.Returns(contentTypeInvalido!);
 
         // Act
-        var resultado = await _service.GenerateDescriptionFromImageAsync(arquivoMock);
+        var resultado = await _service.GenerateDescriptionFromImageAsync(arquivoMock, null);
 
         // Assert
         Assert.False(resultado.IsSuccess);
@@ -73,10 +73,46 @@ public partial class ProductServiceTests
             .Returns(Result<string>.Success(descricaoEsperada));
 
         // Act
-        var resultado = await _service.GenerateDescriptionFromImageAsync(arquivoMock, cts.Token);
+        var resultado = await _service.GenerateDescriptionFromImageAsync(arquivoMock, null, cts.Token);
 
         // Assert
         Assert.True(resultado.IsSuccess);
         Assert.Equal(descricaoEsperada, resultado.Value);
+    }
+
+    [Fact]
+    public async Task GenerateDescriptionFromImageAsync_DeveRetornarSucesso_QuandoUsarImagemAtualDoServidor()
+    {
+        // Arrange
+        var rootPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        var imageRelativePath = Path.Combine("img", "products", "produto-teste.png");
+        var fullImagePath = Path.Combine(rootPath, imageRelativePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(fullImagePath)!);
+        await File.WriteAllBytesAsync(fullImagePath, new byte[] { 1, 2, 3, 4, 5 });
+
+        _environmentMock.WebRootPath.Returns(rootPath);
+
+        var cts = new CancellationTokenSource();
+        var descricaoEsperada = "Descrição gerada a partir da imagem já salva.";
+
+        _geminiServiceMock.GenerateJewelryDescriptionAsync(Arg.Any<Stream>(), "image/png", cts.Token)
+            .Returns(Result<string>.Success(descricaoEsperada));
+
+        try
+        {
+            // Act
+            var resultado = await _service.GenerateDescriptionFromImageAsync(null, imageRelativePath, cts.Token);
+
+            // Assert
+            Assert.True(resultado.IsSuccess);
+            Assert.Equal(descricaoEsperada, resultado.Value);
+        }
+        finally
+        {
+            if (Directory.Exists(rootPath))
+            {
+                Directory.Delete(rootPath, true);
+            }
+        }
     }
 }

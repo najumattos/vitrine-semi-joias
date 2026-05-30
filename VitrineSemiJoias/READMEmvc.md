@@ -59,7 +59,9 @@ Model["Model"]  -->  Mapper1["AutoMapper"]  -->  DTO["DTO"]  -->  Mapper2["AutoM
 
 - 🛍️ **CRUD Completo de Produtos**: Interface administrativa para criar, visualizar, editar e excluir produtos. As ações respeitam regras de negócio (estoque, categorias e visibilidade) e retornam mensagens UX claras (sucesso/erro). A camada de serviço encapsula a lógica e a camada de repositório trata da persistência.
 
-- 📸 **Gerenciamento de Imagens**: Upload seguro de imagens com validação de tipo/bytes e redimensionamento opcional no servidor. Arquivos são armazenados em `wwwroot` com nomes gerados para evitar colisões e caminhos são persistidos no banco para exibição nas views.
+- 📸 **Gerenciamento de Imagens**: Upload seguro de imagens com validação de tipo/bytes e armazenamento em `wwwroot` com nomes gerados para evitar colisões. Caminhos são persistidos no banco para exibição nas views. Interface inclui pré-visualização em tempo real e botão de remoção para descartar a imagem selecionada antes de salvar o formulário, sem comprometer dados já persistidos.
+
+- 🤖 **Geração de Descrição com IA (Google Gemini)**: Integração com a API do Google Gemini para análise automática de imagens. No cadastro (Create) e edição (Edit) de produtos, um botão "Gerar Descrição com IA" permite gerar descrições comerciais direto da imagem. No Edit, o sistema é inteligente e pode usar tanto uma imagem nova (se enviada) quanto a imagem atual do produto (se nenhuma nova for selecionada), mantendo a lógica concentrada na camada de Service conforme o padrão do projeto. Descrições geradas aparecem com feedback visual (sucesso/erro) e podem ser editadas antes de salvar.
 
 - 🗑️ **Exclusão de Arquivos Físicos**: Quando um produto é removido, o sistema elimina também os arquivos de imagem associados (se não usados por outros registros), evitando lixo no disco. A operação é realizada de forma transacional quando possível para manter consistência.
 

@@ -84,7 +84,12 @@
 
                             <div id="containerPreview" class="mt-3" style="display: none;">
                                 <span class="d-block text-muted text-uppercase fw-bold mb-1" style="font-size: 10px;">Pré-visualização</span>
-                                <div id="fotoPreview" class="rounded border p-1 bg-white" style="width: 120px; height: 120px;"></div>
+                                <div class="position-relative d-inline-block">
+                                    <div id="fotoPreview" class="rounded border p-1 bg-white" style="width: 120px; height: 120px;"></div>
+                                    <button type="button" id="btnRemoverFoto" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 translate-middle shadow-sm d-none" aria-label="Remover foto" style="width: 1.75rem; height: 1.75rem; padding: 0; line-height: 1;">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
                             </div>
                             
                             <div id="fotoError" class="alert alert-danger p-2 small mt-2" style="display:none;"></div>
@@ -130,11 +135,12 @@
             const spinnerGerarDescricaoIA = document.getElementById('spinnerGerarDescricaoIA');
             const descricaoTextarea = document.getElementById('Description');
             const descricaoIaFeedback = document.getElementById('descricaoIaFeedback');
+            const btnRemoverFoto = document.getElementById('btnRemoverFoto');
 
             const MAX_FILE_SIZE = 5 * 1024 * 1024;
             const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-            if (!fileInput || !previewDiv || !containerPreview || !errorDiv || !form || !btnGerarDescricaoIA || !spinnerGerarDescricaoIA || !descricaoTextarea || !descricaoIaFeedback) return;
+            if (!fileInput || !previewDiv || !containerPreview || !errorDiv || !form || !btnGerarDescricaoIA || !spinnerGerarDescricaoIA || !descricaoTextarea || !descricaoIaFeedback || !btnRemoverFoto) return;
 
             function exibirFeedbackDescricao(mensagem, sucesso) {
                 descricaoIaFeedback.textContent = mensagem;
@@ -145,7 +151,9 @@
             fileInput.addEventListener('change', function () {
                 previewDiv.innerHTML = '';
                 errorDiv.style.display = 'none';
+                errorDiv.textContent = '';
                 containerPreview.style.display = 'none';
+                btnRemoverFoto.classList.add('d-none');
 
                 if (!fileInput.files || fileInput.files.length === 0) return;
 
@@ -174,8 +182,18 @@
 
                     previewDiv.appendChild(img);
                     containerPreview.style.display = 'block';
+                    btnRemoverFoto.classList.remove('d-none');
                 };
                 reader.readAsDataURL(file);
+            });
+
+            btnRemoverFoto.addEventListener('click', function () {
+                fileInput.value = '';
+                previewDiv.innerHTML = '';
+                containerPreview.style.display = 'none';
+                errorDiv.textContent = '';
+                errorDiv.style.display = 'none';
+                btnRemoverFoto.classList.add('d-none');
             });
 
             form.addEventListener('submit', function (e) {
@@ -192,6 +210,7 @@
             btnGerarDescricaoIA.addEventListener('click', async function () {
                 descricaoIaFeedback.style.display = 'none';
                 errorDiv.style.display = 'none';
+                errorDiv.textContent = '';
 
                 if (!fileInput.files || fileInput.files.length === 0) {
                     exibirFeedbackDescricao('Selecione uma imagem antes de gerar a descrição.', false);

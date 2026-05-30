@@ -68,9 +68,9 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> GenerateDescription(IFormFile arquivoFoto, CancellationToken cancellationToken)
+    public async Task<IActionResult> GenerateDescription(IFormFile? arquivoFoto, string? imageUrlAtual, CancellationToken cancellationToken)
     {
-        var result = await service.GenerateDescriptionFromImageAsync(arquivoFoto, cancellationToken);
+        var result = await service.GenerateDescriptionFromImageAsync(arquivoFoto, imageUrlAtual, cancellationToken);
 
         if (!result.IsSuccess)
         {

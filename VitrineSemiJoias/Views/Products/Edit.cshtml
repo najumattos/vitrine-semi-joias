@@ -44,8 +44,16 @@
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Description" class="form-label fw-semibold text-secondary small">Descrição Detalhada</label>
-                            <textarea asp-for="Description" class="form-control rounded-2" rows="5" placeholder="Descreva os materiais, banho, tamanho e detalhes..."></textarea>
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                                <label asp-for="Description" class="form-label fw-semibold text-secondary small mb-0">Descrição Detalhada</label>
+                                   <button type="button" id="btnGerarDescricaoIA" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center gap-2">
+                                       <i class="bi bi-stars"></i>
+                                       <span>Gerar Descrição com IA</span>
+                                       <span id="spinnerGerarDescricaoIA" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display:none;"></span>
+                                   </button>
+                            </div>
+                            <textarea asp-for="Description" class="form-control rounded-2" rows="5" placeholder="Descreva os materiais, banho, tamanho e diferenciais da peça..."></textarea>
+                            <div id="descricaoIaFeedback" class="small mt-2" style="display:none;"></div>
                             <span asp-validation-for="Description" class="text-danger small d-block mt-1"></span>
                         </div>
                     </div>
@@ -94,7 +102,12 @@
 
                                 <div id="containerPreview" style="display: none;">
                                     <span class="d-block text-success text-uppercase fw-bold mb-1" style="font-size: 10px;">Nova Foto</span>
-                                    <div id="fotoPreview" class="rounded border p-1 bg-white" style="width: 100px; height: 100px;"></div>
+                                    <div class="position-relative d-inline-block">
+                                        <div id="fotoPreview" class="rounded border p-1 bg-white" style="width: 100px; height: 100px;"></div>
+                                        <button type="button" id="btnRemoverFoto" class="btn btn-danger btn-sm rounded-circle position-absolute top-0 end-0 translate-middle shadow-sm d-none" aria-label="Remover foto" style="width: 1.75rem; height: 1.75rem; padding: 0; line-height: 1;">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -119,7 +132,7 @@
                     </a>
                     <button type="submit" class="btn btn-dark rounded-2 px-4 py-2 shadow-sm fw-semibold">
                         <i class="bi bi-arrow-clockwise me-1"></i> Atualizar Joia
-                    </a>
+                        </button>
                 </div>
             </form>
         </div>
@@ -136,16 +149,30 @@
             const previewDiv = document.getElementById('fotoPreview');
             const containerPreview = document.getElementById('containerPreview');
             const errorDiv = document.getElementById('fotoError');
+            const form = document.querySelector('form');
+            const btnGerarDescricaoIA = document.getElementById('btnGerarDescricaoIA');
+            const spinnerGerarDescricaoIA = document.getElementById('spinnerGerarDescricaoIA');
+            const descricaoTextarea = document.getElementById('Description');
+            const descricaoIaFeedback = document.getElementById('descricaoIaFeedback');
+            const btnRemoverFoto = document.getElementById('btnRemoverFoto');
 
             const MAX_FILE_SIZE = 5 * 1024 * 1024;
             const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-            if (!fileInput || !previewDiv || !containerPreview || !errorDiv) return;
+            if (!fileInput || !previewDiv || !containerPreview || !errorDiv || !form || !btnGerarDescricaoIA || !spinnerGerarDescricaoIA || !descricaoTextarea || !descricaoIaFeedback || !btnRemoverFoto) return;
+
+            function exibirFeedbackDescricao(mensagem, sucesso) {
+                descricaoIaFeedback.textContent = mensagem;
+                descricaoIaFeedback.className = sucesso ? 'small mt-2 text-success' : 'small mt-2 text-danger';
+                descricaoIaFeedback.style.display = 'block';
+            }
 
             fileInput.addEventListener('change', function () {
                 previewDiv.innerHTML = '';
                 errorDiv.style.display = 'none';
+                errorDiv.textContent = '';
                 containerPreview.style.display = 'none';
+                btnRemoverFoto.classList.add('d-none');
 
                 if (!fileInput.files || fileInput.files.length === 0) return;
 
@@ -174,9 +201,95 @@
 
                     previewDiv.appendChild(img);
                     containerPreview.style.display = 'block';
+                    btnRemoverFoto.classList.remove('d-none');
                 };
                 reader.readAsDataURL(file);
             });
+
+            btnRemoverFoto.addEventListener('click', function () {
+                fileInput.value = '';
+                previewDiv.innerHTML = '';
+                containerPreview.style.display = 'none';
+                errorDiv.textContent = '';
+                errorDiv.style.display = 'none';
+                btnRemoverFoto.classList.add('d-none');
+            });
+
+            form.addEventListener('submit', function (e) {
+                if (fileInput.files.length === 0) return;
+
+                const file = fileInput.files[0];
+                if (file.size > MAX_FILE_SIZE || !ALLOWED_TYPES.includes(file.type)) {
+                    e.preventDefault();
+                    errorDiv.textContent = 'Erro: Corrija os problemas com o arquivo de imagem antes de salvar.';
+                    errorDiv.style.display = 'block';
+                }
+            });
+
+            btnGerarDescricaoIA.addEventListener('click', async function () {
+    descricaoIaFeedback.style.display = 'none';
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+
+    const file = fileInput.files && fileInput.files.length > 0 ? fileInput.files[0] : null;
+    const inputImageUrl = document.getElementById('ImageUrl');
+    const imageUrlAtual = inputImageUrl ? inputImageUrl.value : '';
+
+    // Se não tem arquivo novo E não tem imagem salva no banco, cancela
+    if (!file && !imageUrlAtual) {
+        exibirFeedbackDescricao('Selecione uma imagem ou certifique-se de que o produto possui uma foto salva antes de gerar a descrição.', false);
+        return;
+    }
+
+    const formData = new FormData();
+
+    if (file) {
+        // Validação estrita do arquivo novo
+        if (file.size > MAX_FILE_SIZE || !ALLOWED_TYPES.includes(file.type)) {
+            exibirFeedbackDescricao('A imagem nova selecionada é inválida. Use JPG, PNG, GIF ou WebP (até 5MB).', false);
+            return;
+        }
+        formData.append('arquivoFoto', file);
+    } else {
+        // Se não há arquivo novo, envia o caminho da imagem que já está no banco
+        formData.append('imageUrlAtual', imageUrlAtual);
+    }
+
+    btnGerarDescricaoIA.disabled = true;
+    spinnerGerarDescricaoIA.style.display = 'inline-block';
+
+    try {
+        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+        if (tokenInput && tokenInput.value) {
+            formData.append('__RequestVerificationToken', tokenInput.value);
+        }
+
+        const response = await fetch('@Url.Action("GenerateDescription", "Products")', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            const message = (data && data.message) ? data.message : 'Não foi possível gerar a descrição agora.';
+            exibirFeedbackDescricao(message, false);
+            return;
+        }
+
+        descricaoTextarea.value = data.description || '';
+        exibirFeedbackDescricao('Descrição gerada com sucesso.', true);
+    } catch (error) {
+        exibirFeedbackDescricao('Erro de comunicação ao gerar a descrição. Tente novamente.', false);
+    } finally {
+        btnGerarDescricaoIA.disabled = false;
+        spinnerGerarDescricaoIA.style.display = 'none';
+    }
+});
         });
     </script>
 }

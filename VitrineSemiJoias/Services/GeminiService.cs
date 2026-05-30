@@ -37,7 +37,7 @@ public class GeminiService(
                 return Result<string>.Failure("A integração de IA não está configurada no servidor.");
             }           
             var model = string.IsNullOrWhiteSpace(_config.Model) ? "gemini-2.5-flash" : _config.Model;
-            var prompt = string.IsNullOrWhiteSpace(_config.Prompt) ? "Recomende uma receita de bolo maluco contendo apenas o passo a passo e modo de preparo em no máximo 500 caracteres" : _config.Prompt;
+            var prompt = string.IsNullOrWhiteSpace(_config.Prompt) ? "Descreva tudo que existe na imagem com no maximo 400 caracteres" : _config.Prompt;
 
             using var memoryStream = new MemoryStream();
             await fileStream.CopyToAsync(memoryStream, cancellationToken);

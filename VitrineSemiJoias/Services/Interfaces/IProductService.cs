@@ -41,9 +41,10 @@ public interface IProductService
     /// Envia a imagem de uma semijoia para a API do Google Gemini para inteligência artificial gerar uma descrição comercial descritiva.
     /// </summary>
     /// <param name="arquivoFoto">O arquivo de imagem da semijoia a ser analisado pela IA.</param>
+    /// <param name="imageUrlAtual">O caminho relativo da imagem atual do produto, usado quando nenhum arquivo novo for enviado.</param>
     /// <param name="cancellationToken">Token para cancelamento ou interrupção antecipada da requisição assíncrona.</param>
     /// <returns>Um objeto Result contendo o texto da descrição gerada pela inteligência artificial.</returns>
-    Task<Result<string>> GenerateDescriptionFromImageAsync(IFormFile arquivoFoto, CancellationToken cancellationToken = default);
+    Task<Result<string>> GenerateDescriptionFromImageAsync(IFormFile? arquivoFoto, string? imageUrlAtual, CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Atualiza as propriedades e/ou substitui a foto de uma semijoia existente no banco de dados.

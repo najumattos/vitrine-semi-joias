@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
 using VitrineSemiJoias.Common;
 using VitrineSemiJoias.DTOs;
 using VitrineSemiJoias.Enums;
@@ -13,6 +14,7 @@ public class ProductService(
     IMapper mapper,
     IFileService fileService,
     IGeminiService geminiService,
+    IWebHostEnvironment environment,
     ILogger<ProductService> logger) : IProductService
 {
     public async Task<Result<ProductDto>> AddProductAsync(ProductDto product, IFormFile arquivoFoto)
@@ -113,18 +115,46 @@ public class ProductService(
         }
     }
 
-    public async Task<Result<string>> GenerateDescriptionFromImageAsync(IFormFile arquivoFoto, CancellationToken cancellationToken = default)
+    public async Task<Result<string>> GenerateDescriptionFromImageAsync(IFormFile? arquivoFoto, string? imageUrlAtual, CancellationToken cancellationToken = default)
     {
-        if (arquivoFoto == null || arquivoFoto.Length == 0)
+        try
         {
-            return Result<string>.Failure("Envie uma imagem válida para gerar a descrição.");
+            if (arquivoFoto != null && arquivoFoto.Length > 0)
+            {
+                if (string.IsNullOrWhiteSpace(arquivoFoto.ContentType) || !arquivoFoto.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                {
+                    return Result<string>.Failure("O arquivo enviado não é uma imagem válida.");
+                }
+
+                await using var uploadedImageStream = arquivoFoto.OpenReadStream();
+                return await geminiService.GenerateJewelryDescriptionAsync(uploadedImageStream, arquivoFoto.ContentType, cancellationToken);
+            }
+
+            var imagemAtualFisica = ResolvePhysicalImagePath(imageUrlAtual);
+            if (string.IsNullOrWhiteSpace(imagemAtualFisica))
+            {
+                return Result<string>.Failure("Envie uma imagem válida para gerar a descrição.");
+            }
+
+            if (!File.Exists(imagemAtualFisica))
+            {
+                return Result<string>.Failure("A imagem atual do produto não foi encontrada no servidor.");
+            }
+
+            var mimeType = ResolveMimeType(imagemAtualFisica);
+            if (string.IsNullOrWhiteSpace(mimeType))
+            {
+                return Result<string>.Failure("O tipo da imagem atual não é suportado para geração de descrição.");
+            }
+
+            await using var currentImageStream = File.OpenRead(imagemAtualFisica);
+            return await geminiService.GenerateJewelryDescriptionAsync(currentImageStream, mimeType, cancellationToken);
         }
-        if (string.IsNullOrWhiteSpace(arquivoFoto.ContentType) || !arquivoFoto.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        catch (Exception ex)
         {
-            return Result<string>.Failure("O arquivo enviado não é uma imagem válida.");
+            logger.LogError(ex, "Erro ao gerar descrição do produto a partir da imagem.");
+            return Result<string>.Failure("Erro inesperado ao gerar descrição da joia.");
         }
-        await using var stream = arquivoFoto.OpenReadStream();
-        return await geminiService.GenerateJewelryDescriptionAsync(stream, arquivoFoto.ContentType, cancellationToken);
     }
 
     public async Task<Result<bool>> UpdateProductAsync(ProductDto product, IFormFile arquivoFoto)
@@ -167,5 +197,40 @@ public class ProductService(
         }
         var novoPath = await fileService.SaveFileAsync(novaFoto, "img/products");
         return novoPath;
+    }
+
+    private string? ResolvePhysicalImagePath(string? imageUrlAtual)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrlAtual) || string.IsNullOrWhiteSpace(environment.WebRootPath))
+        {
+            return null;
+        }
+
+        var normalizedPath = imageUrlAtual.Replace("\\", "/").Trim();
+        if (normalizedPath.StartsWith("~/", StringComparison.Ordinal))
+        {
+            normalizedPath = normalizedPath[2..];
+        }
+
+        if (normalizedPath.StartsWith("/", StringComparison.Ordinal))
+        {
+            normalizedPath = normalizedPath[1..];
+        }
+
+        return Path.IsPathRooted(normalizedPath)
+            ? normalizedPath
+            : Path.Combine(environment.WebRootPath, normalizedPath);
+    }
+
+    private static string? ResolveMimeType(string filePath)
+    {
+        return Path.GetExtension(filePath).ToLowerInvariant() switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".gif" => "image/gif",
+            ".webp" => "image/webp",
+            _ => null
+        };
     }
 }

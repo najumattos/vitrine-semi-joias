@@ -67,7 +67,7 @@ O sistema centraliza o catálogo de forma persistente, leve e sempre disponível
 ---
 ### 🤖 Geração de Descrição com IA
 
-O cadastro de produtos também conta com um fluxo opcional de apoio à escrita da descrição. Na tela de novo produto, o administrador seleciona uma imagem e usa o botão de geração para enviar o arquivo ao serviço de IA; a resposta retorna como texto pronto para edição antes do salvamento final.
+O cadastro e edição de produtos também conta com um fluxo opcional de apoio à escrita da descrição. Na tela de novo produto, o administrador seleciona uma imagem e usa o botão de geração para enviar o arquivo ao serviço de IA; a resposta retorna como texto pronto para edição antes do salvamento final.
 
 ![Descricao Gerada](./Docs/IMGdescricao.png)
 
@@ -108,7 +108,7 @@ Para configurar o recurso, preencha a seção `Gemini` no `appsettings.json`:
 ```
 
 ```bash
-  sqlcmd-S"(localdb)\MSSQLLocalDB"-dDB_Vitrine_Semi_Joias-i.\Data\INSERTS.sql
+  sqlcmd -S "(localdb)\MSSQLLocalDB" -d DB_Vitrine_Semi_Joias -i ".\Data\INSERTS.sql"
 ```
 
 ```bash

@@ -47,4 +47,34 @@ public class AuthController(IAuthService service, IMapper mapper) : Controller
         await service.Logout(cancellationToken);
         return RedirectToAction("Login");
     }    
+
+    [HttpGet]
+    public IActionResult ForgotPassword(string? returnUrl = null)
+    {
+        ViewData["ReturnUrl"] = returnUrl;
+        return View();
+    }
+
+   [HttpPost]
+[ValidateAntiForgeryToken]
+public IActionResult ForgotPassword(ForgotPasswordViewModel viewModel, string? returnUrl = null)
+{
+    ViewData["ReturnUrl"] = returnUrl;
+
+    if (!ModelState.IsValid)
+    {
+        return View(viewModel);
+    }     
+    
+    TempData["SuccessMessage"] = "Verifique seu e-mail. Se o endereço estiver cadastrado, você receberá as instruções para redefinir sua senha.";
+
+    return RedirectToAction(nameof(ForgotPassword), new { returnUrl });
+}
+
+[HttpGet]
+    public IActionResult ResetPassword(string? returnUrl = null)
+    {
+        ViewData["ReturnUrl"] = returnUrl;
+        return View();
+    }
 }

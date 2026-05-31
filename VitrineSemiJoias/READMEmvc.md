@@ -67,6 +67,8 @@ Model["Model"]  -->  Mapper1["AutoMapper"]  -->  DTO["DTO"]  -->  Mapper2["AutoM
 
 - 🔐 **Autenticação Segura**: Integração com ASP.NET Core Identity para cadastro, login, logout, e recuperação de senha. Cookies de autenticação são configurados com políticas seguras e as rotas administrativas exigem autorização baseada em `ProfileEnum`.
 
+- 🔁 **Redefinição de Senha (Esqueci a senha)**: Fluxo completo de recuperação com geração de token, link de callback e envio de e-mail via SMTP (MailKit/Mailtrap). O processo protege contra enumeração de usuários e retorna mensagens amigáveis para o usuário.
+
 - 👤 **Área Administrativa**: Painel restrito a usuários autorizados para gerenciar catálogo e imagens. Controles com validação de entrada, proteção contra CSRF e feedback imediato para o usuário (TempData / toasts).
 
 - 📊 **Catálogo de Produtos**: Página pública com listagem paginada e filtros por categoria/preço. Dados são obtidos de forma otimizada pelo repositório (projeções via DTO/ViewModel) para evitar carregamento desnecessário de imagens ou propriedades.

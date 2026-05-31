@@ -32,6 +32,8 @@ Nesta aplicação, eles utilizam:
 - captura de `AntiforgeryToken` e cookies de sessão;
 - `IAsyncLifetime` do xUnit para preparar e limpar o ambiente de teste.
 
+Os fluxos de autenticação mais sensíveis, como **esqueci minha senha** e **redefinição de senha**, também são cobertos. Nesses cenários, o serviço de e-mail é substituído por mock usando `NSubstitute` e as asserções são feitas com `FluentAssertions` para garantir o comportamento fim a fim sem depender de SMTP real.
+
 Esse nível de teste é mais próximo do uso real da aplicação e ajuda a validar a integração entre as camadas.
 
 ## Diferença de Escopo

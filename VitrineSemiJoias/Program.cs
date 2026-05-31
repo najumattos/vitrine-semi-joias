@@ -43,6 +43,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
 builder.Services.Configure<MostruarioOptions>(builder.Configuration.GetSection("Mostruario"));
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSmartServices();
 builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 

@@ -17,5 +17,8 @@ public class ConfigurationProfile : Profile
         CreateMap<LoginDto, LoginViewModel>().ReverseMap();
         CreateMap<UserModel, AuthUserDto>().ReverseMap();
 
+        CreateMap<ForgotPasswordDto, ForgotPasswordViewModel>().ReverseMap();
+        CreateMap<ResetPasswordDto, ResetPasswordViewModel>().ReverseMap();
+
     }
 }

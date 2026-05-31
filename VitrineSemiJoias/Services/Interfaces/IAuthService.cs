@@ -13,6 +13,20 @@ public interface IAuthService
     Task<Result<AuthUserDto>> ValidateUserAsync(LoginDto loginDto);
 
     /// <summary>
+    /// Processa a solicitacao de esqueci minha senha, gerando token e enviando email.
+    /// </summary>
+    /// <param name="dto">Objeto contendo o email do usuario.</param>
+    /// <returns>Um objeto Result indicando sucesso ou falha.</returns>
+    Task<Result> ProcessForgotPasswordAsync(ForgotPasswordDto dto);
+
+    /// <summary>
+    /// Processa a redefinicao de senha do usuario.
+    /// </summary>
+    /// <param name="dto">Objeto contendo email, token e nova senha.</param>
+    /// <returns>Um objeto Result indicando sucesso ou falha.</returns>
+    Task<Result> ProcessResetPasswordAsync(ResetPasswordDto dto);
+
+    /// <summary>
     /// Encerra a sessão do usuário atual limpando os cookies de autenticação.
     /// </summary>
     /// <param name="cancellationToken">Token de cancelamento para interromper a operação assíncrona se a requisição for cancelada.</param>

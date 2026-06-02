@@ -82,6 +82,21 @@ Para configurar o recurso, preencha a seção `Gemini` no `appsettings.json`:
 
 * **Validação do arquivo:** o fluxo aceita apenas imagens válidas e exibe feedback quando o arquivo selecionado é inválido ou excede o tamanho permitido.
 
+### 🔁 **Redefinição de Senha (Esqueci a senha)**:
+Fluxo completo de recuperação com geração de token, link de callback e envio de e-mail via SMTP (MailKit/Mailtrap). O processo protege contra enumeração de usuários e retorna mensagens amigáveis para o usuário.
+Para configurar o recurso, preencha a seção `SmtpSettings` no `appsettings.json`:
+```json
+"SmtpSettings": {
+      "Server": "sandbox.smtp.mailtrap.io",
+      "Port": 2525,
+      "SenderName": "Camila Reis Semi Joias",
+      "SenderEmail": "nao-responda@CRsemijoias.com",
+      "Username": "preencher com usuario",
+      "Password": "preencher com senha"
+    },
+```
+![Mailtrap](./Docs/settingsMailtrap.png)
+
 ## 🚀 Como Executar o Projeto
 
 ### Pré-requisitos

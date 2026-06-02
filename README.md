@@ -2,7 +2,7 @@
 
 # 💎 Camila Reis — Vitrine de Semijoias & Acessórios
 
-Site desenvolvido em ASP.NET Core 8 MVC para o **FDEVS2026** que serve como catálogo interativo e gerenciador de vitrine digital. O sistema foi projetado sob princípios sólidos de engenharia de software para otimizar a exibição de produtos, profissionalizar o contato com o cliente e eliminar gargalos logísticos do comércio tradicional por redes sociais.
+Site desenvolvido em ASP.NET Core 8 MVC que serve como catálogo interativo e gerenciador de vitrine digital. O sistema foi projetado sob princípios sólidos de engenharia de software para otimizar a exibição de produtos, profissionalizar o contato com o cliente e eliminar gargalos logísticos do comércio tradicional por redes sociais.
 
 ![Home Page](./Docs/homePage.png)
 
@@ -17,9 +17,8 @@ Site desenvolvido em ASP.NET Core 8 MVC para o **FDEVS2026** que serve como cat�
   - [Stack Tecnológica](#stack-tecnológica)
   - [Próximas Etapas & Roadmap de Evolução](#próximas-etapas--roadmap-de-evolução)
 ---
-- [Documentacao Website](./VitrineSemiJoias/READMEmvc.md)
-- [Documentacao Projeto de Testes](./Tests/READMEtests.md)
-- [Repositorio FDevs](https://github.com/najumattos/FDEVS2026)
+- [Documentacao Website](./VitrineSemiJoias/README.md)
+- [Documentacao Projeto de Testes](./Tests/README.md)
 ---
 
 ## 🎯 O Cenário & O Problema

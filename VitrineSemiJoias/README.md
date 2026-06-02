@@ -69,6 +69,9 @@ Model["Model"]  -->  Mapper1["AutoMapper"]  -->  DTO["DTO"]  -->  Mapper2["AutoM
 
 - 🔁 **Redefinição de Senha (Esqueci a senha)**: Fluxo completo de recuperação com geração de token, link de callback e envio de e-mail via SMTP (MailKit/Mailtrap). O processo protege contra enumeração de usuários e retorna mensagens amigáveis para o usuário.
 
+![Mailtrap](../Docs/mailtrap.png)
+caixa de entrada `mailtrap.io/`
+
 - 👤 **Área Administrativa**: Painel restrito a usuários autorizados para gerenciar catálogo e imagens. Controles com validação de entrada, proteção contra CSRF e feedback imediato para o usuário (TempData / toasts).
 
 - 📊 **Catálogo de Produtos**: Página pública com listagem paginada e filtros por categoria/preço. Dados são obtidos de forma otimizada pelo repositório (projeções via DTO/ViewModel) para evitar carregamento desnecessário de imagens ou propriedades.

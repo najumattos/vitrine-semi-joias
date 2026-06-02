@@ -8,14 +8,15 @@ Site desenvolvido em ASP.NET Core 8 MVC que serve como catálogo interativo e ge
 
 ## ⭐  Sumário
  Neste Readme
-  - [O Cenário & O Problema](#o-cenário--o-problema)
-  - [A Solução Desenvolvida](#a-solução-desenvolvida)
-  - [Benefícios para o Negócio](#benefícios-para-o-negócio)
-  - [Principais Funcionalidades](#funcionalidades)
-    - [Geração de Descrição com IA](#geração-de-descrição-com-ia)
-  - [Como Executar o Projeto](#como-executar-o-projeto)
-  - [Stack Tecnológica](#stack-tecnológica)
-  - [Próximas Etapas & Roadmap de Evolução](#próximas-etapas--roadmap-de-evolução)
+  - O Cenário & O Problema
+  - A Solução Desenvolvida
+  - Benefícios para o Negócio
+  - Principais Funcionalidades
+    - Geração de Descrição com IA
+    - Redefinição de Senha (Esqueci a senha)
+  - Como Executar o Projeto
+  - Stack Tecnológica
+  - Próximas Etapas & Roadmap de Evolução
 ---
 - [Documentacao Website](./VitrineSemiJoias/README.md)
 - [Documentacao Projeto de Testes](./Tests/README.md)
@@ -95,7 +96,7 @@ Para configurar o recurso, preencha a seção `SmtpSettings` no `appsettings.jso
       "Password": "preencher com senha"
     },
 ```
-![Mailtrap](./Docs/settingsMailtrap.png)
+
 
 ## 🚀 Como Executar o Projeto
 

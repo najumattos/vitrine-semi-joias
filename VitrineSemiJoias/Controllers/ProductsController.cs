@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VitrineSemiJoias.DTOs;
 using VitrineSemiJoias.Enums;
@@ -7,6 +8,7 @@ using VitrineSemiJoias.ViewModels;
 
 namespace VitrineSemiJoias.Controllers;
 
+[Authorize(Policy = "AdminOnly")]
 public class ProductsController(IProductService service, IMapper mapper) : Controller
 {
     [HttpGet]
@@ -34,6 +36,7 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
     }
      
     [HttpGet]
+    
     public async Task<IActionResult> Details(int id)
     {
         var result = await service.GetProductByIdAsync(id);
@@ -89,6 +92,7 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ProductViewModel product, IFormFile arquivoFoto)
     {
       if (!ModelState.IsValid) return View(product);
@@ -112,6 +116,7 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ProductViewModel product, IFormFile arquivoFoto)
     {
        if (!ModelState.IsValid) return View(product);

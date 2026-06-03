@@ -30,7 +30,7 @@ public class UserConfig : IEntityTypeConfiguration<UserModel>
             NormalizedUserName = "CAMILA@ADMIN.COM",
             NormalizedEmail = "CAMILA@ADMIN.COM",   
             EmailConfirmed = true,
-            Profile = ProfileEnum.Admin, // 🌟 Garante que o usuário inicial nasça como Administrador
+            Profile = ProfileEnum.Admin, 
             SecurityStamp = "937c4a6c-0d92-4783-927c-43320f57172f" 
         };
         adminUser.PasswordHash = passwordHasher.HashPassword(adminUser, "123456");

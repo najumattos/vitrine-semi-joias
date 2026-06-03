@@ -1,8 +1,11 @@
 using DotNetEnv;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using VitrineSemiJoias.Common;
 using VitrineSemiJoias.Configurations;
 using VitrineSemiJoias.Data;
+using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Models;
 using VitrineSemiJoias.Services;
 using VitrineSemiJoias.Services.Interfaces;
@@ -34,6 +37,15 @@ builder.Services.AddIdentity<UserModel, IdentityRole<int>>(options =>
 })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<UserModel>, UserClaimsPrincipalFactory>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireAuthenticatedUser()
+              .RequireClaim("Profile", ProfileEnum.Admin.ToString()));
+});
 
 builder.Services.ConfigureApplicationCookie(options =>
 {

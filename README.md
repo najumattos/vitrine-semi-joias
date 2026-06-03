@@ -179,7 +179,7 @@ Para garantir a confiabilidade das regras de negócio e a estabilidade das integ
 * **NSubstitute** - Ferramenta para criação de dublês de teste (Mocks) de forma fluida.
 * **GitHub Actions** - Automação da esteira de Integração Contínua (CI).
 
-> 📝 **Nota de Implementação:** Para conferir os detalhes técnicos de cobertura, cenários testados, padrões adotados e instruções de execução, acesse o **[README do projeto de testes](./Tests/READMEtests.md)**.
+> 📝 **Nota de Implementação:** Para conferir os detalhes técnicos de cobertura, cenários testados, padrões adotados e instruções de execução, acesse o **[README do projeto de testes](./Tests/README.md)**.
 
 ## 🔮 Próximas Etapas & Roadmap de Evolução
 

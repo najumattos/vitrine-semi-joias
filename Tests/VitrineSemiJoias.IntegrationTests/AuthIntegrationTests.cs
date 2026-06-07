@@ -1,31 +1,32 @@
 ﻿using System.Net;
-using System.Text.RegularExpressions;
 using System.Web;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using VitrineSemiJoias.Data;
 using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Models;
 using VitrineSemiJoias.Services.Interfaces;
 
 namespace VitrineSemiJoias.IntegrationTests;
 
-public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory<Program>>, IAsyncLifetime
+public partial class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory<Program>>, IAsyncLifetime
 {
     private readonly HttpClient _client;
     private readonly WebApplicationFactory<Program> _factory;
     private readonly IEmailSenderService _emailSender;
+    
     private const string SeedEmail = "camila@admin.com";
     private const string SeedPassword = "SenhaValida123!";
-    private string _antiForgeryToken = string.Empty;
-    private IEnumerable<string> _securityCookies = Enumerable.Empty<string>();
     private string _callbackUrl = string.Empty;
 
     public AuthIntegrationTests(CustomWebApplicationFactory<Program> factory)
     {
-        _emailSender = Substitute.For<IEmailSenderService>();
+        _factory = factory;
+        _emailSender = factory.EmailSenderMock;
+
         _emailSender
             .SendPasswordResetAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
             .Returns(Task.CompletedTask);
@@ -34,46 +35,21 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory<Pr
             .When(call => call.SendPasswordResetAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>()))
             .Do(call => _callbackUrl = call.ArgAt<string>(1));
 
-        _factory = factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureServices(services =>
-            {
-                var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IEmailSenderService));
-                if (descriptor != null)
-                {
-                    services.Remove(descriptor);
-                }
-
-                services.AddSingleton(_emailSender);
-            });
-        });
-
-        _client = _factory.CreateClient(new Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryClientOptions
+        _client = _factory.CreateClient(new WebApplicationFactoryClientOptions
         {
             AllowAutoRedirect = false
         });
     }
 
-    // 🚀 Executa uma única vez ANTES de rodar os testes da classe
     public async Task InitializeAsync()
     {
-        var response = await _client.GetAsync("/Auth/Login");
-        var html = await response.Content.ReadAsStringAsync();
+        using var scope = _factory.Server.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await db.Database.EnsureCreatedAsync();
 
-        var match = Regex.Match(html, @"__RequestVerificationToken"" type=""hidden"" value=""([^""]+)""");
-        if (!match.Success)
-            throw new InvalidOperationException("Não foi possível localizar o AntiforgeryToken.");
-
-        _antiForgeryToken = match.Groups[1].Value;
-        
-        if (response.Headers.TryGetValues("Set-Cookie", out var cookies))
-        {
-            _securityCookies = cookies;
-        }
-
-        using var scope = _factory.Services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
         var existingUser = await userManager.FindByEmailAsync(SeedEmail);
+
         if (existingUser != null)
         {
             await userManager.DeleteAsync(existingUser);
@@ -86,156 +62,139 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory<Pr
             Name = "Camila Admin",
             Profile = ProfileEnum.Admin
         };
-
-        await userManager.CreateAsync(user, SeedPassword);
+        var createResult = await userManager.CreateAsync(user, SeedPassword);
+        createResult.Succeeded.Should().BeTrue(
+            string.Join("; ", createResult.Errors.Select(e => e.Description)));
+        (await userManager.CheckPasswordAsync(user, SeedPassword)).Should().BeTrue();
     }
 
-    // Executa APÓS o fim de todos os testes (descarte/limpeza se necessário)
     public Task DisposeAsync() => Task.CompletedTask;
 
     [Fact]
     public async Task Login_DeveAutenticarERedirecionar_QuandoCredenciaisForemValidas()
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Post, "/Auth/Login");
-        
-        foreach (var cookie in _securityCookies)
+        var request = new HttpRequestMessage(HttpMethod.Post, "/Auth/Login")
         {
-            request.Headers.TryAddWithoutValidation("Cookie", cookie);
-        }
-
-        request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            { "__RequestVerificationToken", _antiForgeryToken }, 
-            { "Email", SeedEmail },
-            { "Password", SeedPassword }
-        });
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "__RequestVerificationToken", "" },
+                { "Email", SeedEmail },
+                { "Password", SeedPassword }
+            })
+        };
 
         // Act
         var response = await _client.SendAsync(request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
-        Assert.Contains("/Products", response.Headers.Location?.OriginalString);
+        response.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        response.Headers.Location?.OriginalString.Should().Contain("/Products");
     }
 
     [Fact]
     public async Task Login_DeveRetornarMesmaViewComErro_QuandoEmailNaoExistir()
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Post, "/Auth/Login");
-        
-        foreach (var cookie in _securityCookies) 
-            request.Headers.TryAddWithoutValidation("Cookie", cookie);
-
-        request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+        var request = new HttpRequestMessage(HttpMethod.Post, "/Auth/Login")
         {
-            { "__RequestVerificationToken", _antiForgeryToken },
-            { "Email", "email-fantasma@naoexiste.com" },
-            { "Password", "qualquer-senha" }
-        });
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "__RequestVerificationToken", "" },
+                { "Email", "email-fantasma@naoexiste.com" },
+                { "Password", "eu-preciso-de-um-emprego" }
+            })
+        };
 
         // Act
         var response = await _client.SendAsync(request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode); 
-        
+        response.StatusCode.Should().Be(HttpStatusCode.OK); 
         var htmlContent = await response.Content.ReadAsStringAsync();
-        Assert.Contains("Senha ou email incorretos.", htmlContent); 
+        htmlContent.Should().Contain("Senha ou email incorretos."); 
     }
 
     [Fact]
     public async Task Login_DeveRetornarMesmaViewComErro_QuandoSenhaForIncorreta()
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Post, "/Auth/Login");
-        
-        foreach (var cookie in _securityCookies) 
-            request.Headers.TryAddWithoutValidation("Cookie", cookie);
-
-        request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+        var request = new HttpRequestMessage(HttpMethod.Post, "/Auth/Login")
         {
-            { "__RequestVerificationToken", _antiForgeryToken },
-            { "Email", SeedEmail },
-            { "Password", "SenhaErrada123!" }
-        });
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "__RequestVerificationToken", "" },
+                { "Email", SeedEmail },
+                { "Password", "SenhaErrada123!" }
+            })
+        };
 
         // Act
         var response = await _client.SendAsync(request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode); 
-        
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var htmlContent = await response.Content.ReadAsStringAsync();
-        Assert.Contains("Senha ou email incorretos.", htmlContent);
+        htmlContent.Should().Contain("Senha ou email incorretos.");
     }
 
     [Fact]
     public async Task Login_DeveBarrearRequisicao_QuandoCamposObrigatoriosForemVazios()
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Post, "/Auth/Login");
-        
-        foreach (var cookie in _securityCookies) 
-            request.Headers.TryAddWithoutValidation("Cookie", cookie);
-
-        request.Content = new FormUrlEncodedContent(new Dictionary<string, string>
+        var request = new HttpRequestMessage(HttpMethod.Post, "/Auth/Login")
         {
-            { "__RequestVerificationToken", _antiForgeryToken },
-            { "Email", "" },
-            { "Password", "" }
-        });
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "__RequestVerificationToken", "" },
+                { "Email", "" },
+                { "Password", "" }
+            })
+        };
 
         // Act
         var response = await _client.SendAsync(request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         var htmlContent = await response.Content.ReadAsStringAsync();
-        Assert.Contains("action=\"/Auth/Login\"", htmlContent);
-        Assert.Contains("type=\"password\"", htmlContent);
+        htmlContent.Should().Contain("action=\"/Auth/Login\"");
+        htmlContent.Should().Contain("type=\"password\"");
     }
 
     [Fact]
     public async Task RedefinirSenha_DeveAlterarSenhaNoBanco_QuandoFluxoForConcluidoComSucesso()
     {
         // Arrange
-        const string email = "camila@admin.com";
+        const string emailMutavel = "camila.mutavel@admin.com";
         const string senhaAntiga = "SenhaTemporaria123!";
         const string senhaNova = "SenhaNova123!";
 
-        using (var scope = _factory.Services.CreateScope())
+        using (var scope = _factory.Server.Services.CreateScope())
         {
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
-            var existingUser = await userManager.FindByEmailAsync(email);
-            if (existingUser != null)
-            {
-                await userManager.DeleteAsync(existingUser);
-            }
-
+            
             var user = new UserModel
             {
-                UserName = email,
-                Email = email,
-                Name = "Camila Admin",
+                UserName = emailMutavel,
+                Email = emailMutavel,
+                Name = "Camila Mutável",
                 Profile = ProfileEnum.Admin
             };
             var createResult = await userManager.CreateAsync(user, senhaAntiga);
-            createResult.Succeeded.Should().BeTrue();
+            createResult.Succeeded.Should().BeTrue(
+                string.Join("; ", createResult.Errors.Select(e => e.Description)));
         }
 
         // Act 1: ForgotPassword
-        var forgotRequest = new HttpRequestMessage(HttpMethod.Post, "/Auth/ForgotPassword");
-        foreach (var cookie in _securityCookies)
+        var forgotRequest = new HttpRequestMessage(HttpMethod.Post, "/Auth/ForgotPassword")
         {
-            forgotRequest.Headers.TryAddWithoutValidation("Cookie", cookie);
-        }
-        forgotRequest.Content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            { "__RequestVerificationToken", _antiForgeryToken },
-            { "Email", email }
-        });
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "__RequestVerificationToken", "" },
+                { "Email", emailMutavel }
+            })
+        };
 
         var forgotResponse = await _client.SendAsync(forgotRequest);
 
@@ -243,29 +202,26 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory<Pr
         forgotResponse.StatusCode.Should().Be(HttpStatusCode.Redirect);
         _callbackUrl.Should().NotBeNullOrWhiteSpace();
 
-        // Extração do token
         var callbackUri = new Uri(_callbackUrl);
         var query = HttpUtility.ParseQueryString(callbackUri.Query);
         var callbackEmail = query["email"];
         var callbackToken = query["token"];
 
-        callbackEmail.Should().Be(email);
+        callbackEmail.Should().Be(emailMutavel);
         callbackToken.Should().NotBeNullOrWhiteSpace();
 
         // Act 2: ResetPassword
-        var resetRequest = new HttpRequestMessage(HttpMethod.Post, "/Auth/ResetPassword");
-        foreach (var cookie in _securityCookies)
+        var resetRequest = new HttpRequestMessage(HttpMethod.Post, "/Auth/ResetPassword")
         {
-            resetRequest.Headers.TryAddWithoutValidation("Cookie", cookie);
-        }
-        resetRequest.Content = new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            { "__RequestVerificationToken", _antiForgeryToken },
-            { "Email", callbackEmail! },
-            { "Token", callbackToken! },
-            { "NewPassword", senhaNova },
-            { "ConfirmPassword", senhaNova }
-        });
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "__RequestVerificationToken", "" },
+                { "Email", callbackEmail! },
+                { "Token", callbackToken! },
+                { "NewPassword", senhaNova },
+                { "ConfirmPassword", senhaNova }
+            })
+        };
 
         var resetResponse = await _client.SendAsync(resetRequest);
 
@@ -274,10 +230,10 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory<Pr
         resetResponse.Headers.Location?.OriginalString.Should().Be("/Auth/Login");
 
         // Assert Final
-        using (var scope = _factory.Services.CreateScope())
+        using (var scope = _factory.Server.Services.CreateScope())
         {
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserModel>>();
-            var user = await userManager.FindByEmailAsync(email);
+            var user = await userManager.FindByEmailAsync(emailMutavel);
             user.Should().NotBeNull();
 
             var senhaAntigaValida = await userManager.CheckPasswordAsync(user!, senhaAntiga);

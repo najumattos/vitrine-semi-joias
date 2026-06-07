@@ -1,45 +1,67 @@
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using VitrineSemiJoias.Data;
+using VitrineSemiJoias.Services.Interfaces;
 
 namespace VitrineSemiJoias.IntegrationTests;
 
-// O 'Program' aqui se refere à classe do seu Program.cs do projeto web
 public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
+    private const string InMemoryDatabaseName = "IntegrationTestsDb";
+
+    public IEmailSenderService EmailSenderMock { get; } = Substitute.For<IEmailSenderService>();
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
-    {
-        // 1. Remove a configuração original do SQL Server
-        var descriptor = services.SingleOrDefault(
-            d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
-
-        if (descriptor != null)
         {
-            services.Remove(descriptor);
-        }
+            var descriptorsToRemove = services.Where(d =>
+                d.ServiceType == typeof(DbContextOptions<AppDbContext>) ||
+                d.ServiceType == typeof(DbContextOptions)).ToList();
 
-        // 2. Adiciona o EF Core In-Memory Database
-        services.AddDbContext<AppDbContext>(options =>
-        {
-            options.UseInMemoryDatabase("BancoDeTestesIntegrados");
+            foreach (var descriptor in descriptorsToRemove)
+            {
+                services.Remove(descriptor);
+            }
+
+            var internalServiceProvider = new ServiceCollection()
+                .AddEntityFrameworkInMemoryDatabase()
+                .BuildServiceProvider();
+
+            services.AddDbContext<AppDbContext>((_, options) =>
+            {
+                options.UseInMemoryDatabase(InMemoryDatabaseName)
+                       .UseInternalServiceProvider(internalServiceProvider);
+            });
+
+            var emailDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IEmailSenderService));
+            if (emailDescriptor != null)
+            {
+                services.Remove(emailDescriptor);
+            }
+
+            services.AddSingleton(EmailSenderMock);
+
+            services.Configure<MvcOptions>(options =>
+            {
+                options.Filters.Add(new IgnoreAntiforgeryTokenAttribute());
+            });
         });
 
-        // 🔥 3. Força o ASP.NET Core a ignorar o ValidateAntiForgeryToken nos testes
-        services.AddControllersWithViews(options =>
+        builder.ConfigureTestServices(services =>
         {
-            options.Filters.Add(new Microsoft.AspNetCore.Mvc.IgnoreAntiforgeryTokenAttribute());
-        });
+            foreach (var descriptor in services.Where(d => d.ServiceType == typeof(IAntiforgery)).ToList())
+            {
+                services.Remove(descriptor);
+            }
 
-        // 4. Garante a criação do esquema do banco em memória
-        var sp = services.BuildServiceProvider();
-        using var scope = sp.CreateScope();
-        var scopedServices = scope.ServiceProvider;
-        var db = scopedServices.GetRequiredService<AppDbContext>();
-        db.Database.EnsureCreated();
-    });
+            services.AddSingleton<IAntiforgery, AlwaysValidAntiforgery>();
+        });
     }
 }

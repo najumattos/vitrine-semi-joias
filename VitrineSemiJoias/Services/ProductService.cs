@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Hosting;
 using VitrineSemiJoias.Common;
 using VitrineSemiJoias.DTOs;
 using VitrineSemiJoias.Enums;
@@ -169,7 +168,7 @@ public class ProductService(
             }
             produtoOriginal.JewelryCode = product.JewelryCode;
             produtoOriginal.Title = product.Title;
-            produtoOriginal.Description = product.Description;
+            produtoOriginal.Description = product.Description ?? string.Empty;
             produtoOriginal.Price = product.Price;
             produtoOriginal.CategoryEnum = product.CategoryEnum;
             produtoOriginal.IsAvailable = product.IsAvailable;

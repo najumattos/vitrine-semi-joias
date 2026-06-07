@@ -9,7 +9,7 @@ public class ResetPasswordViewModel
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Token e obrigatorio.")]
-    public string Token { get; set; } = string.Empty;
+    public string? Token { get; set; }
 
     [Required(ErrorMessage = "Nova senha e obrigatoria.")]
     [DataType(DataType.Password)]

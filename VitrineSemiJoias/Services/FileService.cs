@@ -7,7 +7,7 @@ public class FileService(IWebHostEnvironment environment, IHttpContextAccessor h
     public async Task<string> SaveFileAsync(IFormFile file, string subDirectory)
     {
         if (file == null || file.Length == 0)
-            return null;
+            return null ;
 
         // Criar diretório se não existir
         var uploadsPath = Path.Combine(environment.WebRootPath, subDirectory);

@@ -117,7 +117,7 @@ public class ProductsController(IProductService service, IMapper mapper) : Contr
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(ProductViewModel product, IFormFile arquivoFoto)
+    public async Task<IActionResult> Edit(ProductViewModel product, IFormFile? arquivoFoto)
     {
        if (!ModelState.IsValid) return View(product);
         

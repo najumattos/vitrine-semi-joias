@@ -5,6 +5,6 @@ namespace VitrineSemiJoias.Models;
 
 public class UserModel : IdentityUser<int>
 {
-    public string Name { get; set; }   
+    public string Name { get; set; } = string.Empty;   
     public ProfileEnum Profile { get; set; }
 }

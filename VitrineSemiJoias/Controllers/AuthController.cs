@@ -32,7 +32,7 @@ public class AuthController(
 
         if (!result.IsSuccess)
         {            
-            ModelState.AddModelError(string.Empty, result.Error);
+            ModelState.AddModelError(string.Empty, result.Error ?? "Ocorreu um erro inesperado ao realizar o login.");
             return View(loginVM);
         }     
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))

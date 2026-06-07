@@ -4,7 +4,7 @@ GO
 INSERT INTO Products (Title, Description, Price, ImageUrl, CategoryEnum, IsAvailable, JewelryCode)
 VALUES 
 ('Anel Solitario de Prata Zirconia', 'Anel solitario classico confeccionado em prata 925 ...', 129.90, 'img/products/0dbbbb54-45e6-4330-9347-59178c45b7de.jpg', 'Anel', 1, 1001),
-('Pulseira Com Pingente de Cora��o', 'Pulseira dourada com pingente fixo', 54.00, 'img/products/c03a9129-3562-43f2-b82d-355fa0da8fdd.jpg', 'Pulseira', 1, 1017),
+('Pulseira Com Pingente de Cora��o', 'Um pulso usa uma elegante pulseira dourada, cravejada com pedras brancas quadradas. No centro da pulseira, uma vistosa pedra vermelha em formato de gota se destaca. A manga de uma camisa branca é visível ao lado esquerdo.', 54.00, 'img/products/c03a9129-3562-43f2-b82d-355fa0da8fdd.jpg', 'Pulseira', 1, 1017),
 ('Pulseira Dupla com Pingentes', 'Pulseira Dupla Dourada com Pingentes', 60.00, 'img/products/e39950b4-e3ad-445b-a0fd-2df55d9b9b64.jpg', 'Pulseira', 1, 1032),
 ('Pulseira Transada com Pingente', 'Pulseira Transada com Pingente de La�o | Dispon�...', 55.00, 'img/products/c5ca8225-5ba1-45b7-83ea-fe36506e8168.jpg', 'Pulseira', 1, 1033),
 ('Pulseira Com Pedra Gota', 'Pulseira disponivel com Pedras nas cores Verde, Tr...', 50.00, 'img/products/88e81a35-7747-4ce1-a523-c4cd769bffff.jpg', 'Pulseira', 1, 1035),

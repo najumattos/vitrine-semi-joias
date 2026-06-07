@@ -12,6 +12,7 @@ public class ResetPasswordViewModel
     public string Token { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Nova senha e obrigatoria.")]
+    [StringLength(100, ErrorMessage = "A {0} deve ter pelo menos {2} caracteres.", MinimumLength = 6)]
     [DataType(DataType.Password)]
     public string NewPassword { get; set; } = string.Empty;
 

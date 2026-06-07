@@ -137,7 +137,7 @@ public class AuthService(
         {
             var errors = string.Join("; ", resetResult.Errors.Select(error => error.Description));
             logger.LogWarning("Falha ao redefinir senha para {Email}: {Errors}", dto.Email, errors);
-            return Result.Failure("Nao foi possivel redefinir a senha.");
+            return Result.Failure(errors);
         }
 
         logger.LogInformation("Senha redefinida com sucesso para {Email}", dto.Email);

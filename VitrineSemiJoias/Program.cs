@@ -1,5 +1,3 @@
-using DotNetEnv;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using VitrineSemiJoias.Common;
@@ -7,11 +5,8 @@ using VitrineSemiJoias.Configurations;
 using VitrineSemiJoias.Data;
 using VitrineSemiJoias.Enums;
 using VitrineSemiJoias.Models;
-using VitrineSemiJoias.Services;
-using VitrineSemiJoias.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
-Env.Load();
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program).Assembly);
 
 
@@ -36,16 +31,15 @@ builder.Services.AddIdentity<UserModel, IdentityRole<int>>(options =>
     options.SignIn.RequireConfirmedAccount = false;
 })
     .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddErrorDescriber<IdentityMensagensPortugues>();
 
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<UserModel>, UserClaimsPrincipalFactory>();
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy =>
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminOnly", policy =>
         policy.RequireAuthenticatedUser()
               .RequireClaim("Profile", ProfileEnum.Admin.ToString()));
-});
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -53,11 +47,11 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     options.SlidingExpiration = true;
 });
+
 builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
 builder.Services.Configure<MostruarioOptions>(builder.Configuration.GetSection("Mostruario"));
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddSmartServices();
-builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 
 var app = builder.Build();
 

@@ -84,3 +84,6 @@ dotnet test .\Tests\VitrineSemiJoias.IntegrationTests\VitrineSemiJoias.Integrati
 A qualidade do projeto é garantida automaticamente por uma esteira no GitHub Actions. Em cada Pull Request direcionado para `main`, o pipeline compila a solução e executa os testes em passos separados para unidades e integração.
 
 Essa divisão é importante porque isola falhas por camada, reduz o tempo de diagnóstico e impede que mudanças incorretas cheguem à branch principal sem validação.
+
+- [Artigo baseado neste projeto: CI — Continuous Integration (Integração Contínua)](https://blog-najuliarmattos.vercel.app/#/post/15)
+- [Documentacao Website](../VitrineSemiJoias/README.md)
